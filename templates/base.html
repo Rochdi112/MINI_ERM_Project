@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Mini ERP - MIF Maroc</title>
+  <script src="/static/js/htmx.min.js"></script>
+  <script src="/static/js/alpine.min.js" defer></script>
+  <link href="/static/css/tailwind.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+  <nav class="bg-white shadow p-4 flex justify-between items-center">
+    <div class="text-xl font-bold text-blue-600">MIF ERP</div>
+    <div class="space-x-4">
+      <a href="/" class="text-gray-700 hover:underline">🏠 Dashboard</a>
+      <a href="/clients/" class="text-gray-700 hover:underline">👥 Clients</a>
+      <a href="/techniciens/" class="text-gray-700 hover:underline">👷 Techniciens</a>
+      <a href="/interventions/" class="text-gray-700 hover:underline">🛠 Interventions</a>
+      <a href="/materiels/" class="text-gray-700 hover:underline">🔧 Matériels</a>
+      <a href="/rapports/" class="text-gray-700 hover:underline">📄 Rapports</a>
+    </div>
+  </nav>
+
+  <main class="p-6">
+    {% block content %}{% endblock %}
+  </main>
+
+</body>
+</html>

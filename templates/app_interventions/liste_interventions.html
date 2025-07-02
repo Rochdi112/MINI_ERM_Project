@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-xl mb-4">Liste des interventions</h2>
+<a href="{% url 'intervention_create' %}" class="bg-blue-500 text-white px-4 py-2 rounded">Nouvelle Intervention</a>
+<table class="table-auto w-full mt-4">
+    <thead><tr><th>Client</th><th>Matériel</th><th>Technicien</th><th>Type</th><th>Statut</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for i in interventions %}
+        <tr class="border-t">
+            <td>{{ i.client.nom }}</td>
+            <td>{{ i.materiel.nom }}</td>
+            <td>{{ i.technicien.nom }}</td>
+            <td>{{ i.get_type_display }}</td>
+            <td>{{ i.get_statut_display }}</td>
+            <td>
+                <a href="{% url 'intervention_update' i.id %}" class="text-blue-600">Modifier</a> |
+                <a href="{% url 'intervention_delete' i.id %}" class="text-red-600">Supprimer</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <style>
+    body { font-family: Arial, sans-serif; font-size: 12px; }
+    h1 { text-align: center; margin-bottom: 20px; }
+    .section { margin-bottom: 20px; }
+  </style>
+</head>
+<body>
+  <h1>Rapport d’Intervention</h1>
+  <div class="section">
+    <strong>Client :</strong> {{ rapport.intervention.client.nom }}<br>
+    <strong>Lieu :</strong> {{ rapport.intervention.lieu }}<br>
+    <strong>Date :</strong> {{ rapport.intervention.date }}<br>
+    <strong>Technicien :</strong> {{ rapport.intervention.technicien.nom }}
+  </div>
+  <div class="section">
+    <strong>Description de l’intervention :</strong><br>
+    {{ rapport.description|linebreaks }}
+  </div>
+</body>
+</html>

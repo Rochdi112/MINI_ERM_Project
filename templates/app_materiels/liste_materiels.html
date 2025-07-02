@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-xl mb-4">Liste des matériels</h2>
+<a href="{% url 'materiel_create' %}" class="bg-blue-500 text-white px-4 py-2 rounded">Ajouter Matériel</a>
+<table class="table-auto w-full mt-4">
+    <thead><tr><th>Nom</th><th>Référence</th><th>Marque</th><th>Date d'installation</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for materiel in materiels %}
+        <tr class="border-t">
+            <td>{{ materiel.nom }}</td>
+            <td>{{ materiel.reference }}</td>
+            <td>{{ materiel.marque }}</td>
+            <td>{{ materiel.date_installation }}</td>
+            <td>
+                <a href="{% url 'materiel_update' materiel.id %}" class="text-blue-600">Modifier</a> |
+                <a href="{% url 'materiel_delete' materiel.id %}" class="text-red-600">Supprimer</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="text-xl mb-4">Liste des techniciens</h2>
+<a href="{% url 'technicien_create' %}" class="bg-blue-500 text-white px-4 py-2 rounded">Ajouter Technicien</a>
+<table class="table-auto w-full mt-4">
+    <thead><tr><th>Nom</th><th>Email</th><th>Spécialité</th><th>Actions</th></tr></thead>
+    <tbody>
+    {% for technicien in techniciens %}
+        <tr class="border-t">
+            <td>{{ technicien.nom }}</td>
+            <td>{{ technicien.email }}</td>
+            <td>{{ technicien.specialite }}</td>
+            <td>
+                <a href="{% url 'technicien_update' technicien.id %}" class="text-blue-600">Modifier</a> |
+                <a href="{% url 'technicien_delete' technicien.id %}" class="text-red-600">Supprimer</a>
+            </td>
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}
