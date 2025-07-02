@@ -3,7 +3,7 @@
 ## 📦 Prérequis
 - Python 3.10+
 - Node.js & npm
-- PostgreSQL ou SQLite
+-  SQLite
 - WeasyPrint installé
 
 ## 🚀 Déploiement sur Render (ou Railway)

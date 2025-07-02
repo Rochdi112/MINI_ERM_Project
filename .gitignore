@@ -1,8 +1,25 @@
+# Python
 __pycache__/
 *.py[cod]
-db.sqlite3
-media/
-node_modules/
+*.sqlite3
+*.log
+
+# Env / Secret files
 .env
-/staticfiles/
-/.vscode/
+
+# Django
+media/
+staticfiles/
+db.sqlite3
+
+# Node / Tailwind
+node_modules/
+package-lock.json
+
+# IDEs
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

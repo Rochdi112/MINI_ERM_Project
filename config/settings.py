@@ -3,7 +3,9 @@ from pathlib import Path
 
 # === BASE ===
 BASE_DIR = Path(__file__).resolve().parent.parent
-SECRET_KEY = 'django-insecure-1234567890'
+
+# === SÉCURITÉ ===
+SECRET_KEY = 'django-insecure-1234567890'  # Remplacer en prod
 DEBUG = True
 ALLOWED_HOSTS = []
 
@@ -15,6 +17,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
+    # Apps du projet
     'core',
     'app_clients',
     'app_techniciens',
@@ -34,14 +38,14 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# === URL ROOT ===
+# === ROOT URL ===
 ROOT_URLCONF = 'config.urls'
 
 # === TEMPLATES ===
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'core' / 'templates'],
+        'DIRS': [BASE_DIR / 'templates'],  # ✅ Corrigé ici
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -66,7 +70,7 @@ DATABASES = {
 }
 
 # === AUTH ===
-AUTH_PASSWORD_VALIDATORS = []
+AUTH_PASSWORD_VALIDATORS = []  # Tu peux ajouter des validateurs ici
 
 # === LOCALISATION ===
 LANGUAGE_CODE = 'fr-fr'

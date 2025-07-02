@@ -1,21 +1,3 @@
 {% extends 'base.html' %}
-{% block content %}
-<div class="p-6">
-  <h1 class="text-2xl font-bold mb-4">📊 Tableau de bord</h1>
-
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="p-4 border rounded-lg shadow bg-white">
-      <h2 class="text-xl">👷 Techniciens</h2>
-      <p class="text-3xl font-bold">{{ techniciens_count }}</p>
-    </div>
-    <div class="p-4 border rounded-lg shadow bg-white">
-      <h2 class="text-xl">🏢 Clients</h2>
-      <p class="text-3xl font-bold">{{ clients_count }}</p>
-    </div>
-    <div class="p-4 border rounded-lg shadow bg-white">
-      <h2 class="text-xl">🛠 Interventions</h2>
-      <p class="text-3xl font-bold">{{ interventions_count }}</p>
-    </div>
-  </div>
-</div>
-{% endblock %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}<h2>Bienvenue sur le Dashboard</h2>{% endblock %}
