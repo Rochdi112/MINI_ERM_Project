@@ -1,12 +1,19 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-    <title>{% block title %}Mini ERP{% endblock %}</title>
+  <!-- TailwindCSS -->
+  <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+  <!-- Flowbite CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet">
+  <title>{% block title %}Mini ERP{% endblock %}</title>
 </head>
-<body>
-    <header><h1>Mini ERP</h1></header>
-    <main>
-        {% block content %}{% endblock %}
-    </main>
+<body class="bg-gray-100">
+  <!-- Navbar/contenu -->
+  {% block content %}{% endblock %}
+  
+  <!-- scripts -->
+  <script src="{% static 'js/htmx.min.js' %}"></script>
+  <script src="{% static 'js/alpine.min.js' %}"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
 </body>
 </html>

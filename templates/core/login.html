@@ -1,0 +1,22 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Connexion</title>
+    <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
+</head>
+<body class="min-h-screen flex items-center justify-center bg-gray-100">
+    <form method="post" class="bg-white p-6 rounded shadow-md w-80">
+        {% csrf_token %}
+        <h2 class="text-2xl font-bold mb-4 text-center">Connexion</h2>
+        {{ form.as_p }}
+        {% if error %}
+            <p class="text-red-500 text-sm">{{ error }}</p>
+        {% endif %}
+        <button type="submit" class="mt-4 w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700">
+            Se connecter
+        </button>
+    </form>
+</body>
+</html>
