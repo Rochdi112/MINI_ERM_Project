@@ -1,8 +1,39 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponseForbidden
-from app_interventions.models import Intervention
 from django.utils import timezone
+from app_interventions.models import Intervention
+from app_techniciens.models import Technicien
+from app_materiels.models import Materiel
+from app_clients.models import Site
+from django.db.models import Count, Q
+
+@login_required
+def dashboard(request):
+    interventions = Intervention.objects.all()
+    materiels = Materiel.objects.all()
+    techniciens = Technicien.objects.all()
+    sites = Site.objects.all()
+
+    total_interventions = interventions.count()
+    cloturees = interventions.filter(statut='terminee').count()
+    taux_cloture = (cloturees / total_interventions * 100) if total_interventions else 0
+    techniciens_actifs = techniciens.filter(interventions__isnull=False).distinct().count()
+    materiel_par_site = list(sites.annotate(nb_materiel=Count('materiels')).values_list('nom', 'nb_materiel'))
+    interventions_par_type = list(interventions.values('type').annotate(count=Count('id')))
+    interventions_par_mois = list(
+        interventions.extra({'mois': "strftime('%%Y-%%m', date)"}).values('mois').annotate(count=Count('id')).order_by('mois')
+    )
+
+    context = {
+        'total_interventions': total_interventions,
+        'taux_cloture': taux_cloture,
+        'techniciens_actifs': techniciens_actifs,
+        'materiel_par_site': materiel_par_site,
+        'interventions_par_type': interventions_par_type,
+        'interventions_par_mois': interventions_par_mois,
+    }
+    return render(request, 'dashboard/dashboard.html', context)
 
 @login_required
 def dashboard_kpi_htmx(request):

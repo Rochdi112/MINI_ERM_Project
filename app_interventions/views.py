@@ -1,16 +1,15 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseForbidden
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import logging
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .models import Intervention, ChecklistItem, Attachment
+from .models import Intervention, ChecklistItem, Attachment, FichierJoint
 from .forms import InterventionForm, ChecklistItemForm, AttachmentForm
 from core.models import ProfilUtilisateur
 from django.views.decorators.http import require_POST
-from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
@@ -281,3 +280,13 @@ def modal_form_intervention_htmx(request):
     else:
         form = InterventionForm()
     return render(request, 'app_interventions/_intervention_modal_form.html', {'form': form, 'success': False})
+
+@login_required
+@require_POST
+def upload_fichier_joint_htmx(request, intervention_id):
+    intervention = get_object_or_404(Intervention, pk=intervention_id)
+    fichier = request.FILES.get('fichier')
+    if not fichier:
+        return JsonResponse({'error': 'Aucun fichier reçu.'}, status=400)
+    joint = FichierJoint.objects.create(intervention=intervention, fichier=fichier)
+    return render(request, 'app_interventions/_fichier_joint_item.html', {'joint': joint})

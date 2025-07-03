@@ -1,9 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Créer ou modifier un site</h2>
-<form method="post">{% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit" class="btn btn-success">Enregistrer</button>
-    <a href="{% url 'app_clients:site_list' %}" class="btn btn-secondary">Annuler</a>
+<h2 class="text-2xl font-bold mb-4">Créer ou modifier un site</h2>
+<form method="post" class="space-y-4">{% csrf_token %}
+    <div class="space-y-2">
+        {{ form.as_p }}
+    </div>
+    <div class="flex space-x-2">
+        <button type="submit" class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:ring-4 focus:ring-blue-300">Enregistrer</button>
+        <a href="{% url 'app_clients:site_list' %}" class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">Annuler</a>
+    </div>
 </form>
 {% endblock %}

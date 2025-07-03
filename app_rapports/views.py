@@ -70,9 +70,10 @@ def rapport_pdf(request, pk):
     rapport = get_object_or_404(Rapport, pk=pk)
     intervention = rapport.intervention
     checklist = intervention.checklist_items.all()
-    attachments = intervention.attachments.all()
+    # Inclure tous les fichiers joints (Attachment + FichierJoint)
+    attachments = list(intervention.attachments.all()) + list(getattr(intervention, 'fichiers_joints', []).all() if hasattr(intervention, 'fichiers_joints') else [])
     signature_url = intervention.signature_path.url if intervention.signature_path else None
-    html_string = render_to_string('app_rapports/pdf_templates.html', {
+    html_string = render_to_string('app_rapports/rapport_pdf_template.html', {
         'rapport': rapport,
         'intervention': intervention,
         'checklist': checklist,

@@ -1,30 +1,32 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Liste des sites</h2>
-<a href="{% url 'app_clients:site_create' %}" class="btn btn-primary mb-2">Nouveau site</a>
-<table class="table">
-    <thead>
+<h2 class="text-2xl font-bold mb-4">Liste des sites</h2>
+<a href="{% url 'app_clients:site_create' %}" class="inline-block mb-2 px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">Nouveau site</a>
+<div class="overflow-x-auto">
+<table class="min-w-full text-sm text-left text-gray-500 border rounded-lg">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
         <tr>
-            <th>Nom</th>
-            <th>Adresse</th>
-            <th>Client</th>
-            <th>Actions</th>
+            <th scope="col" class="px-6 py-3">Nom</th>
+            <th scope="col" class="px-6 py-3">Adresse</th>
+            <th scope="col" class="px-6 py-3">Client</th>
+            <th scope="col" class="px-6 py-3">Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for site in sites %}
-        <tr>
-            <td>{{ site.nom }}</td>
-            <td>{{ site.adresse }}</td>
-            <td>{{ site.client.nom }}</td>
-            <td>
-                <a href="{% url 'app_clients:site_update' site.pk %}" class="btn btn-sm btn-warning">Modifier</a>
-                <a href="{% url 'app_clients:site_delete' site.pk %}" class="btn btn-sm btn-danger">Supprimer</a>
+        <tr class="bg-white border-b hover:bg-gray-50">
+            <td class="px-6 py-4">{{ site.nom }}</td>
+            <td class="px-6 py-4">{{ site.adresse }}</td>
+            <td class="px-6 py-4">{{ site.client.nom }}</td>
+            <td class="px-6 py-4 space-x-2">
+                <a href="{% url 'app_clients:site_update' site.pk %}" class="inline-block px-3 py-1 text-xs text-white bg-yellow-500 rounded hover:bg-yellow-600">Modifier</a>
+                <a href="{% url 'app_clients:site_delete' site.pk %}" class="inline-block px-3 py-1 text-xs text-white bg-red-600 rounded hover:bg-red-700">Supprimer</a>
             </td>
         </tr>
         {% empty %}
-        <tr><td colspan="4">Aucun site enregistré.</td></tr>
+        <tr><td colspan="4" class="px-6 py-4 text-center">Aucun site enregistré.</td></tr>
         {% endfor %}
     </tbody>
 </table>
+</div>
 {% endblock %}

@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Tableau de bord</h2>
+<div class="row">
+  <div class="col-md-3"><div class="card"><div class="card-body"><h5>Total interventions</h5><p>{{ total_interventions }}</p></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><h5>Taux de clôture</h5><p>{{ taux_cloture|floatformat:1 }} %</p></div></div></div>
+  <div class="col-md-3"><div class="card"><div class="card-body"><h5>Techniciens actifs</h5><p>{{ techniciens_actifs }}</p></div></div></div>
+</div>
+<hr>
+<div class="row">
+  <div class="col-md-6">
+    <canvas id="typeChart"></canvas>
+  </div>
+  <div class="col-md-6">
+    <canvas id="moisChart"></canvas>
+  </div>
+</div>
+<hr>
+<h4>Matériel par site</h4>
+<table class="table table-bordered">
+  <thead><tr><th>Site</th><th>Nombre de matériels</th></tr></thead>
+  <tbody>
+    {% for nom, nb in materiel_par_site %}
+      <tr><td>{{ nom }}</td><td>{{ nb }}</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+const typeLabels = [{% for t in interventions_par_type %}"{{ t.type }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+const typeData = [{% for t in interventions_par_type %}{{ t.count }}{% if not forloop.last %},{% endif %}{% endfor %}];
+const ctxType = document.getElementById('typeChart').getContext('2d');
+new Chart(ctxType, {
+  type: 'pie',
+  data: {
+    labels: typeLabels,
+    datasets: [{
+      label: 'Interventions par type',
+      data: typeData,
+      backgroundColor: ['#36a2eb', '#ff6384', '#ffce56'],
+    }]
+  }
+});
+const moisLabels = [{% for m in interventions_par_mois %}"{{ m.mois }}"{% if not forloop.last %},{% endif %}{% endfor %}];
+const moisData = [{% for m in interventions_par_mois %}{{ m.count }}{% if not forloop.last %},{% endif %}{% endfor %}];
+const ctxMois = document.getElementById('moisChart').getContext('2d');
+new Chart(ctxMois, {
+  type: 'bar',
+  data: {
+    labels: moisLabels,
+    datasets: [{
+      label: 'Interventions par mois',
+      data: moisData,
+      backgroundColor: '#36a2eb',
+    }]
+  }
+});
+</script>
+{% endblock %}

@@ -1,5 +1,41 @@
 {% extends 'base.html' %}
 {% block title %}Rapport pdf template{% endblock %}
 {% block content %}
-<h2>Rapport pdf template</h2>
+<h1>Rapport d’Intervention</h1>
+<div>
+  <strong>Client :</strong> {{ intervention.client.nom }}<br>
+  <strong>Site :</strong> {{ intervention.site.nom }}<br>
+  <strong>Date :</strong> {{ intervention.date }}<br>
+  <strong>Technicien :</strong> {{ intervention.technicien.nom }}
+</div>
+<div>
+  <strong>Description de l’intervention :</strong><br>
+  {{ rapport.contenu|linebreaks }}
+</div>
+<div>
+  <strong>Checklist :</strong>
+  <ul>
+    {% for item in checklist %}
+      <li>{{ item.description }} : {% if item.completed %}✔{% else %}✗{% endif %}</li>
+    {% empty %}
+      <li>Aucun item</li>
+    {% endfor %}
+  </ul>
+</div>
+<div>
+  <strong>Fichiers joints :</strong>
+  <ul>
+    {% for att in attachments %}
+      <li>{{ att.file.name|default:att.fichier.name }}</li>
+    {% empty %}
+      <li>Aucun fichier joint</li>
+    {% endfor %}
+  </ul>
+</div>
+{% if signature_url %}
+<div style="margin-top:30px;">
+  <strong>Signature :</strong><br>
+  <img src="{{ signature_url }}" alt="Signature" style="max-width:200px; max-height:100px;"/>
+</div>
+{% endif %}
 {% endblock %}

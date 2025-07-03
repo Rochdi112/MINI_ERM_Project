@@ -5,6 +5,7 @@ from .forms import LoginForm
 from django.contrib.auth.decorators import login_required
 from django.db.models import Count, Q
 from app_interventions.models import Intervention
+from .decorators import role_required
 
 def login_view(request):
     if request.user.is_authenticated:
@@ -29,6 +30,7 @@ def logout_view(request):
     return redirect('login')
 
 @login_required
+@role_required('admin')
 def dashboard_view(request):
     kpis = Intervention.objects.aggregate(
         total=Count('id'),

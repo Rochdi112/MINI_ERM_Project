@@ -42,9 +42,9 @@ class ChecklistItem(models.Model):
     def __str__(self):
         return f"{self.description} ({'✔' if self.completed else '✗'})"
 
-class Attachment(models.Model):
-    intervention = models.ForeignKey(Intervention, on_delete=models.CASCADE, related_name='attachments', verbose_name="Intervention")
-    file = models.FileField(upload_to='attachments/', verbose_name="Fichier")
+class FichierJoint(models.Model):
+    intervention = models.ForeignKey(Intervention, on_delete=models.CASCADE, related_name='fichiers_joints', verbose_name="Intervention")
+    fichier = models.FileField(upload_to='fichiers_joints/', verbose_name="Fichier")
     uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Date d'upload")
 
     def __str__(self):
