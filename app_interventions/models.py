@@ -25,6 +25,7 @@ class Intervention(models.Model):
     date_cloture = models.DateField(null=True, blank=True, verbose_name="Date de clôture")
     description = models.TextField(blank=True, verbose_name="Description")
     date = models.DateField(verbose_name="Date d'intervention")
+    signature_path = models.ImageField(upload_to='signatures/', null=True, blank=True, verbose_name="Signature")
 
     class Meta:
         verbose_name = "Intervention"

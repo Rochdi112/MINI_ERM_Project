@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Liste des sites</h2>
+<a href="{% url 'app_clients:site_create' %}" class="btn btn-primary mb-2">Nouveau site</a>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Nom</th>
+            <th>Adresse</th>
+            <th>Client</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for site in sites %}
+        <tr>
+            <td>{{ site.nom }}</td>
+            <td>{{ site.adresse }}</td>
+            <td>{{ site.client.nom }}</td>
+            <td>
+                <a href="{% url 'app_clients:site_update' site.pk %}" class="btn btn-sm btn-warning">Modifier</a>
+                <a href="{% url 'app_clients:site_delete' site.pk %}" class="btn btn-sm btn-danger">Supprimer</a>
+            </td>
+        </tr>
+        {% empty %}
+        <tr><td colspan="4">Aucun site enregistré.</td></tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

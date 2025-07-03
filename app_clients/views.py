@@ -3,8 +3,8 @@ from django.contrib import messages
 from django.urls import reverse_lazy
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
-from .models import Client
-from .forms import ClientForm
+from .models import Client, Site
+from .forms import ClientForm, SiteForm
 from core.models import ProfilUtilisateur
 
 class ClientListView(LoginRequiredMixin, ListView):
@@ -53,4 +53,44 @@ class ClientDeleteView(LoginRequiredMixin, DeleteView):
 
     def delete(self, request, *args, **kwargs):
         messages.success(request, "Client supprimé avec succès.")
+        return super().delete(request, *args, **kwargs)
+
+class SiteListView(LoginRequiredMixin, ListView):
+    model = Site
+    template_name = 'app_clients/site_list.html'
+    context_object_name = 'sites'
+
+class SiteCreateView(LoginRequiredMixin, CreateView):
+    model = Site
+    form_class = SiteForm
+    template_name = 'app_clients/site_form.html'
+    success_url = reverse_lazy('app_clients:site_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Site créé avec succès.")
+        return super().form_valid(form)
+    def form_invalid(self, form):
+        messages.error(self.request, "Erreur lors de la création du site.")
+        return super().form_invalid(form)
+
+class SiteUpdateView(LoginRequiredMixin, UpdateView):
+    model = Site
+    form_class = SiteForm
+    template_name = 'app_clients/site_form.html'
+    success_url = reverse_lazy('app_clients:site_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Site modifié avec succès.")
+        return super().form_valid(form)
+    def form_invalid(self, form):
+        messages.error(self.request, "Erreur lors de la modification du site.")
+        return super().form_invalid(form)
+
+class SiteDeleteView(LoginRequiredMixin, DeleteView):
+    model = Site
+    template_name = 'app_clients/site_confirm_delete.html'
+    success_url = reverse_lazy('app_clients:site_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(self.request, "Site supprimé avec succès.")
         return super().delete(request, *args, **kwargs)

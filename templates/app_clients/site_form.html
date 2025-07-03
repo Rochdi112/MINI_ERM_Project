@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Créer ou modifier un site</h2>
+<form method="post">{% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit" class="btn btn-success">Enregistrer</button>
+    <a href="{% url 'app_clients:site_list' %}" class="btn btn-secondary">Annuler</a>
+</form>
+{% endblock %}

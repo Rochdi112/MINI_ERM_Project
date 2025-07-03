@@ -12,6 +12,8 @@ from weasyprint import HTML
 import tempfile
 import logging
 from django.contrib.auth.decorators import login_required
+from django.conf import settings
+from app_interventions.models import Attachment
 
 logger = logging.getLogger(__name__)
 
@@ -66,19 +68,22 @@ class RapportDeleteView(LoginRequiredMixin, DeleteView):
 @login_required
 def rapport_pdf(request, pk):
     rapport = get_object_or_404(Rapport, pk=pk)
-    user_profile = ProfilUtilisateur.objects.get(user=request.user)
-    # Autorisé si admin ou technicien assigné à l'intervention
-    if not (user_profile.role == 'admin' or (rapport.intervention.technicien and rapport.intervention.technicien.nom == request.user.username)):
-        return HttpResponseForbidden("Vous n'avez pas accès à ce rapport PDF.")
-    html_string = render_to_string('app_rapports/pdf_template.html', {'rapport': rapport})
-
-    html = HTML(string=html_string)
-    result = tempfile.NamedTemporaryFile(delete=True)
-    html.write_pdf(target=result.name)
-
-    with open(result.name, 'rb') as pdf:
-        response = HttpResponse(pdf.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'inline; filename=rapport_{rapport.id}.pdf'
+    intervention = rapport.intervention
+    checklist = intervention.checklist_items.all()
+    attachments = intervention.attachments.all()
+    signature_url = intervention.signature_path.url if intervention.signature_path else None
+    html_string = render_to_string('app_rapports/pdf_templates.html', {
+        'rapport': rapport,
+        'intervention': intervention,
+        'checklist': checklist,
+        'attachments': attachments,
+        'signature_url': signature_url,
+    })
+    with tempfile.NamedTemporaryFile(delete=True) as output:
+        HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf(output.name)
+        output.seek(0)
+        response = HttpResponse(output.read(), content_type='application/pdf')
+        response['Content-Disposition'] = f'filename=rapport_{rapport.pk}.pdf'
         return response
 
 @login_required
