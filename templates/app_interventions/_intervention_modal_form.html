@@ -1,0 +1,10 @@
+<form id="modal-intervention-form" hx-post="{% url 'app_interventions:htmx-modal-form' %}" hx-target="#modal-intervention-form" hx-swap="outerHTML">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit" class="btn btn-primary">Enregistrer</button>
+  {% if success %}
+    <div class="text-green-600 mt-2">Intervention créée avec succès !</div>
+  {% elif form.errors %}
+    <div class="text-red-600 mt-2">Veuillez corriger les erreurs ci-dessous.</div>
+  {% endif %}
+</form>

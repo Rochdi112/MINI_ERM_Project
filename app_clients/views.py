@@ -1,40 +1,56 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth.decorators import login_required
+from django.contrib import messages
+from django.urls import reverse_lazy
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from .models import Client
 from .forms import ClientForm
+from core.models import ProfilUtilisateur
 
-@login_required
-def client_list(request):
-    clients = Client.objects.all()
-    return render(request, 'app_clients/client_list.html', {'clients': clients})
+class ClientListView(LoginRequiredMixin, ListView):
+    model = Client
+    template_name = 'app_clients/client_list.html'
+    context_object_name = 'clients'
 
-@login_required
-def client_create(request):
-    if request.method == 'POST':
-        form = ClientForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('client_list')
-    else:
-        form = ClientForm()
-    return render(request, 'app_clients/client_form.html', {'form': form})
+    def get_queryset(self):
+        user_profile = getattr(self.request.user, 'profilutilisateur', None)
+        qs = super().get_queryset()
+        # Exemple de filtrage par rôle (à adapter selon la logique métier)
+        if user_profile and user_profile.role == 'technicien':
+            return qs.none()
+        return qs
 
-@login_required
-def client_update(request, pk):
-    client = get_object_or_404(Client, pk=pk)
-    if request.method == 'POST':
-        form = ClientForm(request.POST, instance=client)
-        if form.is_valid():
-            form.save()
-            return redirect('client_list')
-    else:
-        form = ClientForm(instance=client)
-    return render(request, 'app_clients/client_form.html', {'form': form})
+class ClientCreateView(LoginRequiredMixin, CreateView):
+    model = Client
+    form_class = ClientForm
+    template_name = 'app_clients/client_form.html'
+    success_url = reverse_lazy('app_clients:client_list')
 
-@login_required
-def client_delete(request, pk):
-    client = get_object_or_404(Client, pk=pk)
-    if request.method == 'POST':
-        client.delete()
-        return redirect('client_list')
-    return render(request, 'app_clients/client_confirm_delete.html', {'client': client})
+    def form_valid(self, form):
+        messages.success(self.request, "Client créé avec succès.")
+        return super().form_valid(form)
+    def form_invalid(self, form):
+        messages.error(self.request, "Erreur lors de la création du client.")
+        return super().form_invalid(form)
+
+class ClientUpdateView(LoginRequiredMixin, UpdateView):
+    model = Client
+    form_class = ClientForm
+    template_name = 'app_clients/client_form.html'
+    success_url = reverse_lazy('app_clients:client_list')
+
+    def form_valid(self, form):
+        messages.success(self.request, "Client modifié avec succès.")
+        return super().form_valid(form)
+    def form_invalid(self, form):
+        messages.error(self.request, "Erreur lors de la modification du client.")
+        return super().form_invalid(form)
+
+class ClientDeleteView(LoginRequiredMixin, DeleteView):
+    model = Client
+    template_name = 'app_clients/client_confirm_delete.html'
+    success_url = reverse_lazy('app_clients:client_list')
+
+    def delete(self, request, *args, **kwargs):
+        messages.success(request, "Client supprimé avec succès.")
+        return super().delete(request, *args, **kwargs)

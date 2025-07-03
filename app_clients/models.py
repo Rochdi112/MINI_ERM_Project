@@ -1,9 +1,9 @@
 from django.db import models
 
 class Client(models.Model):
-    nom = models.CharField(max_length=100, verbose_name="Nom")
-    email = models.EmailField(verbose_name="Email")
-    telephone = models.CharField(max_length=30, verbose_name="Téléphone")
+    nom = models.CharField(max_length=100, verbose_name="Nom", blank=False, null=False)
+    email = models.EmailField(verbose_name="Email", blank=False, null=False)
+    telephone = models.CharField(max_length=30, verbose_name="Téléphone", blank=False, null=False)
 
     class Meta:
         verbose_name = "Client"
@@ -14,8 +14,8 @@ class Client(models.Model):
 
 class Site(models.Model):
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="sites", verbose_name="Client")
-    nom = models.CharField(max_length=100, verbose_name="Nom du site")
-    adresse = models.CharField(max_length=255, verbose_name="Adresse")
+    nom = models.CharField(max_length=100, verbose_name="Nom du site", blank=False, null=False)
+    adresse = models.CharField(max_length=255, verbose_name="Adresse", blank=False, null=False)
 
     class Meta:
         verbose_name = "Site"

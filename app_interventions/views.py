@@ -9,45 +9,14 @@ from django.urls import reverse_lazy
 from .models import Intervention, ChecklistItem, Attachment
 from .forms import InterventionForm, ChecklistItemForm, AttachmentForm
 from core.models import ProfilUtilisateur
+from django.views.decorators.http import require_POST
+from django.db.models import Q
 
 logger = logging.getLogger(__name__)
 
-@login_required
-def intervention_list(request):
-    interventions = Intervention.objects.all()
-    return render(request, 'app_interventions/intervention_list.html', {'interventions': interventions})
+# Suppression des anciennes vues CRUD fonctionnelles
 
-@login_required
-def intervention_create(request):
-    if request.method == 'POST':
-        form = InterventionForm(request.POST)
-        if form.is_valid():
-            form.save()
-            return redirect('intervention_list')
-    else:
-        form = InterventionForm()
-    return render(request, 'app_interventions/intervention_form.html', {'form': form})
-
-@login_required
-def intervention_update(request, pk):
-    intervention = get_object_or_404(Intervention, pk=pk)
-    if request.method == 'POST':
-        form = InterventionForm(request.POST, instance=intervention)
-        if form.is_valid():
-            form.save()
-            return redirect('intervention_list')
-    else:
-        form = InterventionForm(instance=intervention)
-    return render(request, 'app_interventions/intervention_form.html', {'form': form})
-
-@login_required
-def intervention_delete(request, pk):
-    intervention = get_object_or_404(Intervention, pk=pk)
-    if request.method == 'POST':
-        intervention.delete()
-        return redirect('intervention_list')
-    return render(request, 'app_interventions/intervention_confirm_delete.html', {'intervention': intervention})
-
+# Vues checklist, upload, etc. conservées car elles sont spécifiques et sécurisées
 @login_required
 def checklist_view(request, intervention_id):
     intervention = get_object_or_404(Intervention, pk=intervention_id)
@@ -111,20 +80,43 @@ def upload_attachment(request, pk):
 
 @login_required
 def htmx_upload_attachment(request, pk):
+    if not getattr(request, 'htmx', False):
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Requête non autorisée.'}, status=403)
     intervention = get_object_or_404(Intervention, pk=pk)
     user_profile = getattr(request.user, 'profilutilisateur', None)
     if not (user_profile and (user_profile.role == 'admin' or (intervention.technicien and intervention.technicien.nom == request.user.username))):
-        return HttpResponseForbidden("Accès refusé.")
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Accès refusé.'}, status=403)
     if request.method == 'POST':
         form = AttachmentForm(request.POST, request.FILES)
         if form.is_valid():
-            attachment = form.save(commit=False)
-            attachment.intervention = intervention
-            attachment.save()
-            return render(request, 'app_interventions/_attachment_item.html', {'attachment': attachment, 'success': True})
+            try:
+                attachment = form.save(commit=False)
+                attachment.intervention = intervention
+                attachment.save()
+                return render(request, 'app_interventions/_attachment_item.html', {'attachment': attachment, 'success': True})
+            except Exception as e:
+                logger.error(f"Erreur upload fichier : {e}")
+                return render(request, 'components/_alert.html', {'type': 'error', 'message': "Erreur lors de l'upload du fichier."}, status=500)
         else:
-            return render(request, 'components/_alert.html', {'type': 'error', 'message': form.errors.as_text()})
-    return HttpResponse(status=405)
+            return render(request, 'components/_alert.html', {'type': 'error', 'message': form.errors.as_text()}, status=400)
+    return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Méthode non autorisée.'}, status=405)
+
+@login_required
+def htmx_checklist_toggle(request, pk):
+    if not getattr(request, 'htmx', False):
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Requête non autorisée.'}, status=403)
+    item = get_object_or_404(ChecklistItem, pk=pk)
+    user_profile = getattr(request.user, 'profilutilisateur', None)
+    # Seul admin ou technicien assigné à l'intervention peut modifier
+    if not (user_profile and (user_profile.role == 'admin' or (item.intervention.technicien and item.intervention.technicien.nom == request.user.username))):
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Accès refusé.'}, status=403)
+    try:
+        item.completed = not item.completed
+        item.save()
+        return render(request, 'app_interventions/_checklist_item.html', {'item': item})
+    except Exception as e:
+        logger.error(f"Erreur toggle checklist : {e}")
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': "Erreur lors du changement d'état."}, status=500)
 
 @login_required
 def planifier_preventive(request):
@@ -237,3 +229,55 @@ class InterventionDeleteView(LoginRequiredMixin, DeleteView):
             logger.error(f"Erreur suppression intervention : {e}")
             messages.error(request, "Erreur lors de la suppression de l'intervention.")
             return self.get(request, *args, **kwargs)
+
+@login_required
+def toggle_checklist_item_htmx(request, pk):
+    if not getattr(request, 'htmx', False):
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Requête non autorisée.'}, status=403)
+    item = get_object_or_404(ChecklistItem, pk=pk)
+    user_profile = getattr(request.user, 'profilutilisateur', None)
+    if not (user_profile and (user_profile.role == 'admin' or (item.intervention.technicien and item.intervention.technicien.nom == request.user.username))):
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Accès refusé.'}, status=403)
+    try:
+        item.completed = not item.completed
+        item.save()
+        return render(request, 'app_interventions/_checklist_item.html', {'item': item})
+    except Exception as e:
+        logger.error(f"Erreur toggle checklist : {e}")
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': "Erreur lors du changement d'état."}, status=500)
+
+@login_required
+def filter_interventions_htmx(request):
+    if not getattr(request, 'htmx', False):
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Requête non autorisée.'}, status=403)
+    user_profile = getattr(request.user, 'profilutilisateur', None)
+    qs = Intervention.objects.all()
+    client_id = request.GET.get('client')
+    site_id = request.GET.get('site')
+    materiel_id = request.GET.get('materiel')
+    if client_id:
+        qs = qs.filter(client_id=client_id)
+    if site_id:
+        qs = qs.filter(site_id=site_id)
+    if materiel_id:
+        qs = qs.filter(materiel_id=materiel_id)
+    # Filtrage par rôle
+    if user_profile and user_profile.role == 'technicien':
+        qs = qs.filter(technicien__nom=request.user.username)
+    return render(request, 'app_interventions/_filter_select.html', {'interventions': qs})
+
+@login_required
+def modal_form_intervention_htmx(request):
+    if not getattr(request, 'htmx', False):
+        return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Requête non autorisée.'}, status=403)
+    user_profile = getattr(request.user, 'profilutilisateur', None)
+    if request.method == 'POST':
+        form = InterventionForm(request.POST)
+        if form.is_valid():
+            intervention = form.save()
+            return render(request, 'app_interventions/_intervention_modal_form.html', {'form': InterventionForm(), 'success': True, 'intervention': intervention})
+        else:
+            return render(request, 'app_interventions/_intervention_modal_form.html', {'form': form, 'success': False})
+    else:
+        form = InterventionForm()
+    return render(request, 'app_interventions/_intervention_modal_form.html', {'form': form, 'success': False})

@@ -15,7 +15,7 @@ class Intervention(models.Model):
         ('terminee', 'Terminée'),
     ]
 
-    client = models.ForeignKey(Client, on_delete=models.CASCADE)
+    client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="interventions", verbose_name="Client")
     materiel = models.ForeignKey(Materiel, on_delete=models.CASCADE, related_name="interventions", verbose_name="Matériel")
     technicien = models.ForeignKey(Technicien, on_delete=models.CASCADE, related_name="interventions", verbose_name="Technicien")
     site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="interventions", verbose_name="Site")
@@ -34,17 +34,17 @@ class Intervention(models.Model):
         return f"{self.materiel.nom} - {self.site.nom} ({self.date})"
 
 class ChecklistItem(models.Model):
-    intervention = models.ForeignKey(Intervention, on_delete=models.CASCADE, related_name='checklist_items')
-    description = models.CharField(max_length=255)
-    completed = models.BooleanField(default=False)
+    intervention = models.ForeignKey(Intervention, on_delete=models.CASCADE, related_name='checklist_items', verbose_name="Intervention")
+    description = models.CharField(max_length=255, verbose_name="Description")
+    completed = models.BooleanField(default=False, verbose_name="Terminé")
 
     def __str__(self):
         return f"{self.description} ({'✔' if self.completed else '✗'})"
 
 class Attachment(models.Model):
-    intervention = models.ForeignKey(Intervention, on_delete=models.CASCADE, related_name='attachments')
-    file = models.FileField(upload_to='attachments/')
-    uploaded_at = models.DateTimeField(auto_now_add=True)
+    intervention = models.ForeignKey(Intervention, on_delete=models.CASCADE, related_name='attachments', verbose_name="Intervention")
+    file = models.FileField(upload_to='attachments/', verbose_name="Fichier")
+    uploaded_at = models.DateTimeField(auto_now_add=True, verbose_name="Date d'upload")
 
     def __str__(self):
         return f"Fichier pour intervention {self.intervention.id}"

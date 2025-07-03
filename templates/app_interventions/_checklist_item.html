@@ -1,0 +1,10 @@
+<li id="checklist-item-{{ item.id }}" class="flex items-center gap-2 py-1">
+  <button hx-post="{% url 'app_interventions:htmx_checklist_toggle' item.id %}" hx-target="#checklist-item-{{ item.id }}" hx-swap="outerHTML" class="text-xl">
+    {% if item.completed %}
+      <span class="text-green-600">✔</span>
+    {% else %}
+      <span class="text-gray-400">✗</span>
+    {% endif %}
+  </button>
+  <span class="ml-2">{{ item.description }}</span>
+</li>

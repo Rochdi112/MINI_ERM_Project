@@ -1,0 +1,28 @@
+<form id="filter-form" hx-get="{% url 'app_interventions:htmx-filter' %}" hx-target="#intervention-list" hx-swap="innerHTML">
+  <select name="client" class="form-select">
+    <option value="">Tous les clients</option>
+    {% for client in clients %}
+      <option value="{{ client.id }}">{{ client.nom }}</option>
+    {% endfor %}
+  </select>
+  <select name="site" class="form-select">
+    <option value="">Tous les sites</option>
+    {% for site in sites %}
+      <option value="{{ site.id }}">{{ site.nom }}</option>
+    {% endfor %}
+  </select>
+  <select name="materiel" class="form-select">
+    <option value="">Tous les matériels</option>
+    {% for materiel in materiels %}
+      <option value="{{ materiel.id }}">{{ materiel.nom }}</option>
+    {% endfor %}
+  </select>
+  <button type="submit" class="btn btn-primary">Filtrer</button>
+</form>
+<ul id="intervention-list">
+  {% for intervention in interventions %}
+    <li>{{ intervention }}</li>
+  {% empty %}
+    <li class="text-gray-400">Aucune intervention trouvée.</li>
+  {% endfor %}
+</ul>
