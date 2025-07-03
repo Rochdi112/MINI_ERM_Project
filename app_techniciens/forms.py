@@ -4,4 +4,4 @@ from .models import Technicien
 class TechnicienForm(forms.ModelForm):
     class Meta:
         model = Technicien
-        fields = ['nom', 'email', 'specialite']
+        fields = '__all__'

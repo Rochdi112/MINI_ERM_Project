@@ -1,6 +1,6 @@
 from django.db import models
 from app_techniciens.models import Technicien
-from app_clients.models import Client
+from app_clients.models import Client, Site
 from app_materiels.models import Materiel
 
 class Intervention(models.Model):
@@ -16,16 +16,22 @@ class Intervention(models.Model):
     ]
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE)
-    materiel = models.ForeignKey(Materiel, on_delete=models.CASCADE)
-    technicien = models.ForeignKey(Technicien, on_delete=models.SET_NULL, null=True)
+    materiel = models.ForeignKey(Materiel, on_delete=models.CASCADE, related_name="interventions", verbose_name="Matériel")
+    technicien = models.ForeignKey(Technicien, on_delete=models.CASCADE, related_name="interventions", verbose_name="Technicien")
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="interventions", verbose_name="Site")
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='en_attente')
-    date_creation = models.DateField(auto_now_add=True)
-    date_cloture = models.DateField(null=True, blank=True)
-    description = models.TextField(blank=True)
+    date_creation = models.DateField(auto_now_add=True, verbose_name="Date de création")
+    date_cloture = models.DateField(null=True, blank=True, verbose_name="Date de clôture")
+    description = models.TextField(blank=True, verbose_name="Description")
+    date = models.DateField(verbose_name="Date d'intervention")
+
+    class Meta:
+        verbose_name = "Intervention"
+        verbose_name_plural = "Interventions"
 
     def __str__(self):
-        return f"{self.type} - {self.client.nom} ({self.statut})"
+        return f"{self.materiel.nom} - {self.site.nom} ({self.date})"
 
 class ChecklistItem(models.Model):
     intervention = models.ForeignKey(Intervention, on_delete=models.CASCADE, related_name='checklist_items')

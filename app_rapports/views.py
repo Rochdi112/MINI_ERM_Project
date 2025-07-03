@@ -51,7 +51,6 @@ def generate_pdf(request, pk):
     rapport = get_object_or_404(Rapport, pk=pk)
     user_profile = getattr(request.user, 'profilutilisateur', None)
     if not (user_profile and (user_profile.role == 'admin' or (rapport.intervention.technicien and rapport.intervention.technicien.nom == request.user.username))):
-        messages.error(request, "Accès refusé.")
         return HttpResponseForbidden("Accès refusé.")
     try:
         # Nettoyage ancien PDF si existant

@@ -4,4 +4,7 @@ from .models import Materiel
 class MaterielForm(forms.ModelForm):
     class Meta:
         model = Materiel
-        fields = ['nom', 'reference', 'marque', 'date_installation']
+        fields = '__all__'
+        widgets = {
+            'site': forms.Select(attrs={'class': 'form-select'}),
+        }

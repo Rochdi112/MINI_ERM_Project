@@ -3,10 +3,12 @@ from django.http import HttpResponse, HttpResponseForbidden
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import logging
-
-from core.models import ProfilUtilisateur
+from django.views.generic import ListView, CreateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.urls import reverse_lazy
 from .models import Intervention, ChecklistItem, Attachment
 from .forms import InterventionForm, ChecklistItemForm, AttachmentForm
+from core.models import ProfilUtilisateur
 
 logger = logging.getLogger(__name__)
 
@@ -157,3 +159,81 @@ def planifier_preventive(request):
         logger.error(f"Erreur planification préventive : {e}")
         messages.error(request, "Erreur lors de la planification préventive.")
     return redirect('dashboard')
+
+class InterventionListView(LoginRequiredMixin, ListView):
+    model = Intervention
+    template_name = 'app_interventions/intervention_list.html'
+    context_object_name = 'interventions'
+
+    def get_queryset(self):
+        user_profile = getattr(self.request.user, 'profilutilisateur', None)
+        qs = super().get_queryset()
+        if user_profile and user_profile.role == 'technicien':
+            return qs.filter(technicien__nom=self.request.user.username)
+        return qs
+
+class InterventionCreateView(LoginRequiredMixin, CreateView):
+    model = Intervention
+    form_class = InterventionForm
+    template_name = 'app_interventions/intervention_form.html'
+    success_url = reverse_lazy('app_interventions:intervention_list')
+
+    def form_valid(self, form):
+        try:
+            messages.success(self.request, "Intervention créée avec succès.")
+            return super().form_valid(form)
+        except Exception as e:
+            logger.error(f"Erreur création intervention : {e}")
+            messages.error(self.request, "Erreur lors de la création de l'intervention.")
+            return self.form_invalid(form)
+    def form_invalid(self, form):
+        messages.error(self.request, "Erreur lors de la création de l'intervention.")
+        return super().form_invalid(form)
+
+class InterventionUpdateView(LoginRequiredMixin, UpdateView):
+    model = Intervention
+    form_class = InterventionForm
+    template_name = 'app_interventions/intervention_form.html'
+    success_url = reverse_lazy('app_interventions:intervention_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_profile = getattr(request.user, 'profilutilisateur', None)
+        if user_profile and user_profile.role == 'technicien' and obj.technicien.nom != request.user.username:
+            messages.error(request, "Vous n'avez pas le droit de modifier cette intervention.")
+            from django.http import HttpResponseForbidden
+            return HttpResponseForbidden()
+        return super().dispatch(request, *args, **kwargs)
+    def form_valid(self, form):
+        try:
+            messages.success(self.request, "Intervention modifiée avec succès.")
+            return super().form_valid(form)
+        except Exception as e:
+            logger.error(f"Erreur modification intervention : {e}")
+            messages.error(self.request, "Erreur lors de la modification de l'intervention.")
+            return self.form_invalid(form)
+    def form_invalid(self, form):
+        messages.error(self.request, "Erreur lors de la modification de l'intervention.")
+        return super().form_invalid(form)
+
+class InterventionDeleteView(LoginRequiredMixin, DeleteView):
+    model = Intervention
+    template_name = 'app_interventions/intervention_confirm_delete.html'
+    success_url = reverse_lazy('app_interventions:intervention_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        obj = self.get_object()
+        user_profile = getattr(request.user, 'profilutilisateur', None)
+        if user_profile and user_profile.role == 'technicien' and obj.technicien.nom != request.user.username:
+            messages.error(request, "Vous n'avez pas le droit de supprimer cette intervention.")
+            from django.http import HttpResponseForbidden
+            return HttpResponseForbidden()
+        return super().dispatch(request, *args, **kwargs)
+    def delete(self, request, *args, **kwargs):
+        try:
+            messages.success(request, "Intervention supprimée avec succès.")
+            return super().delete(request, *args, **kwargs)
+        except Exception as e:
+            logger.error(f"Erreur suppression intervention : {e}")
+            messages.error(request, "Erreur lors de la suppression de l'intervention.")
+            return self.get(request, *args, **kwargs)

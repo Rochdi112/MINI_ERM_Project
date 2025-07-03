@@ -7,6 +7,11 @@ class InterventionForm(forms.ModelForm):
     class Meta:
         model = Intervention
         fields = ['client', 'materiel', 'technicien', 'type', 'statut', 'date_cloture', 'description']
+        widgets = {
+            'materiel': forms.Select(attrs={'class': 'form-select'}),
+            'technicien': forms.Select(attrs={'class': 'form-select'}),
+            'site': forms.Select(attrs={'class': 'form-select'}),
+        }
 
 class ChecklistItemForm(forms.ModelForm):
     class Meta:
