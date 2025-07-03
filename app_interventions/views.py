@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.http import HttpResponse, HttpResponseForbidden, JsonResponse
+from django.http import HttpResponse, HttpResponseForbidden, JsonResponse, FileResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 import logging
@@ -11,6 +11,7 @@ from .forms import InterventionForm, ChecklistItemForm
 from .forms_attachment import AttachmentForm
 from core.models import ProfilUtilisateur
 from django.views.decorators.http import require_POST
+from core.decorators import role_required
 
 logger = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ logger = logging.getLogger(__name__)
 
 # Vues checklist, upload, etc. conservées car elles sont spécifiques et sécurisées
 @login_required
+@role_required('technicien')
 def checklist_view(request, intervention_id):
     intervention = get_object_or_404(Intervention, pk=intervention_id)
     items = intervention.checklist_items.all()
@@ -33,6 +35,7 @@ def checklist_view(request, intervention_id):
     return render(request, 'app_interventions/checklist.html', {'intervention': intervention, 'items': items, 'form': form})
 
 @login_required
+@role_required('technicien')
 def checklist_item_update(request, pk):
     item = get_object_or_404(ChecklistItem, pk=pk)
     intervention = item.intervention
@@ -303,3 +306,21 @@ def upload_fichier_joint_htmx(request, intervention_id):
         return JsonResponse({'error': 'Aucun fichier reçu.'}, status=400)
     joint = FichierJoint.objects.create(intervention=intervention, fichier=fichier)
     return render(request, 'app_interventions/_fichier_joint_item.html', {'joint': joint})
+
+@login_required
+def download_fichier_joint(request, joint_id):
+    joint = get_object_or_404(FichierJoint, id=joint_id)
+    intervention = joint.intervention
+    user_profile = getattr(request.user, 'profilutilisateur', None)
+    # Contrôle d'accès : admin, technicien assigné, ou client lié
+    is_allowed = False
+    if user_profile:
+        if user_profile.role == 'admin':
+            is_allowed = True
+        elif user_profile.role == 'technicien' and intervention.techniciens.filter(user=request.user).exists():
+            is_allowed = True
+        elif user_profile.role == 'client' and intervention.client.user == request.user:
+            is_allowed = True
+    if not is_allowed:
+        return HttpResponseForbidden("Accès refusé.")
+    return FileResponse(joint.fichier, as_attachment=True, filename=joint.fichier.name)

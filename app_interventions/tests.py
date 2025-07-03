@@ -20,7 +20,8 @@ class HTMXInterventionsTests(TestCase):
         site = Site.objects.create(client=client, nom='S', adresse='A')
         materiel = Materiel.objects.create(site=site, nom='M', reference='R', marque='X', date_installation='2024-01-01')
         technicien = Technicien.objects.create(nom='tech', email='t@t.com', specialite='s')
-        self.intervention = Intervention.objects.create(client=client, materiel=materiel, technicien=technicien, site=site, type='corrective', statut='en_attente', date=date.today())
+        self.intervention = Intervention.objects.create(client=client, materiel=materiel, site=site, type='corrective', statut='en_attente', date=date.today())
+        self.intervention.techniciens.add(technicien)
         self.item = ChecklistItem.objects.create(intervention=self.intervention, description='Test', completed=False)
         self.client = DjangoClient()
 
@@ -87,7 +88,7 @@ class HTMXInterventionsTests(TestCase):
         data = {
             'client': self.intervention.client.id,
             'materiel': self.intervention.materiel.id,
-            'technicien': self.intervention.technicien.id,
+            'techniciens': [t.id for t in self.intervention.techniciens.all()],
             'site': self.intervention.site.id,
             'type': 'corrective',
             'statut': 'en_attente',
@@ -150,7 +151,8 @@ class HTMXInterventionsTests(TestCase):
             self.site = Site.objects.create(client=c, nom='Site1', adresse='Adr')
             self.materiel = Materiel.objects.create(site=self.site, nom='M', reference='R', marque='Marque', date_installation='2024-01-01')
             self.technicien = Technicien.objects.create(nom='T', email='t@t.com', specialite='S')
-            self.intervention = Intervention.objects.create(materiel=self.materiel, technicien=self.technicien, site=self.site, date='2024-01-01', description='desc')
+            self.intervention = Intervention.objects.create(materiel=self.materiel, site=self.site, date='2024-01-01', description='desc')
+            self.intervention.techniciens.add(self.technicien)
         def test_list_view(self):
             resp = self.client.get(reverse('app_interventions:intervention_list'))
             self.assertEqual(resp.status_code, 200)
@@ -158,7 +160,7 @@ class HTMXInterventionsTests(TestCase):
         def test_create_view(self):
             data = {
                 'materiel': self.materiel.pk,
-                'technicien': self.technicien.pk,
+                'techniciens': [self.technicien.pk],
                 'site': self.site.pk,
                 'date': '2024-01-02',
                 'description': 'Nouvelle intervention'
@@ -170,7 +172,7 @@ class HTMXInterventionsTests(TestCase):
         def test_update_view(self):
             data = {
                 'materiel': self.materiel.pk,
-                'technicien': self.technicien.pk,
+                'techniciens': [self.technicien.pk],
                 'site': self.site.pk,
                 'date': '2024-01-03',
                 'description': 'Modif'

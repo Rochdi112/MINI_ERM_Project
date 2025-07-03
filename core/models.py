@@ -5,11 +5,13 @@ class ProfilUtilisateur(models.Model):
     ROLE_ADMIN = 'admin'
     ROLE_TECH = 'technicien'
     ROLE_CLIENT = 'client'
+    ROLE_CHEF_PROJET = 'chef_projet'
 
     ROLE_CHOICES = (
         (ROLE_ADMIN, 'Administrateur'),
         (ROLE_TECH, 'Technicien'),
         (ROLE_CLIENT, 'Client'),
+        (ROLE_CHEF_PROJET, 'Chef de projet'),
     )
 
     user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='profilutilisateur')

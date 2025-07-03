@@ -6,10 +6,10 @@ import os
 class InterventionForm(forms.ModelForm):
     class Meta:
         model = Intervention
-        fields = ['client', 'materiel', 'technicien', 'site', 'type', 'statut', 'date_cloture', 'description']
+        fields = ['client', 'materiel', 'techniciens', 'site', 'type', 'statut', 'date_cloture', 'description']
         widgets = {
             'materiel': forms.Select(attrs={'class': 'form-select'}),
-            'technicien': forms.Select(attrs={'class': 'form-select'}),
+            'techniciens': forms.SelectMultiple(attrs={'class': 'form-select'}),
             'site': forms.Select(attrs={'class': 'form-select'}),
         }
 

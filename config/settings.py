@@ -111,6 +111,7 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # === TAILLE MAX UPLOAD (par ex. pièces jointes PDF/photos) ===
 DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 Mo
+FILE_UPLOAD_MAX_MEMORY_SIZE = 5242880  # 5MB
 
 # Gestion des fichiers médias
 MEDIA_URL = '/media/'

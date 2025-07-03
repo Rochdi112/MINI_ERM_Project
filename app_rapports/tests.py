@@ -13,7 +13,8 @@ class RapportModelTest(TestCase):
         c = C.objects.create(nom='C', adresse='A', contact='C')
         m = M.objects.create(nom='M', reference='R', marque='Marque', date_installation='2024-01-01')
         t = T.objects.create(nom='T', email='t@t.com', specialite='S')
-        self.intervention = Intervention.objects.create(client=c, materiel=m, technicien=t, type='corrective', statut='en_cours', description='desc')
+        self.intervention = Intervention.objects.create(client=c, materiel=m, type='corrective', statut='en_cours', description='desc')
+        self.intervention.techniciens.add(t)
         self.rapport = Rapport.objects.create(intervention=self.intervention, contenu='Contenu')
     def test_str(self):
         r = self.rapport
@@ -30,7 +31,8 @@ class RapportPDFTest(TestCase):
         c = C.objects.create(nom='C', adresse='A', contact='C')
         m = M.objects.create(nom='M', reference='R', marque='Marque', date_installation='2024-01-01')
         t = T.objects.create(nom='T', email='t@t.com', specialite='S')
-        self.i = Intervention.objects.create(client=c, materiel=m, technicien=t, type='corrective', statut='en_cours', description='desc')
+        self.i = Intervention.objects.create(client=c, materiel=m, type='corrective', statut='en_cours', description='desc')
+        self.i.techniciens.add(t)
         self.r = Rapport.objects.create(intervention=self.i, contenu='Contenu')
     def test_pdf(self):
         resp = self.client.get(reverse('app_rapports:generate_pdf', args=[self.r.pk]))

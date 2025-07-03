@@ -19,11 +19,11 @@ class ClientModelTest(TestCase):
             client=client,
             materiel=materiel,
             site=site,
-            technicien=technicien,
             type='corrective',
             statut='en_attente',
             date='2024-01-01'
         )
+        intervention.techniciens.add(technicien)
         self.client_obj = intervention.client
         self.item = ChecklistItem.objects.create(description='test item', completed=False, intervention=intervention)
     def test_str(self):

@@ -7,6 +7,7 @@ from app_techniciens.models import Technicien
 from app_materiels.models import Materiel
 from app_clients.models import Site
 from django.db.models import Count, Q
+from django.db import models
 
 @login_required
 def dashboard(request):
@@ -24,6 +25,15 @@ def dashboard(request):
     interventions_par_mois = list(
         interventions.extra({'mois': "strftime('%%Y-%%m', date)"}).values('mois').annotate(count=Count('id')).order_by('mois')
     )
+    en_cours = interventions.filter(statut='en_cours').count()
+    annulees = interventions.filter(statut='annulee').count()
+    moyenne_duree = None
+    if total_interventions:
+        durees = interventions.exclude(date_cloture__isnull=True).annotate(
+            duree=(models.F('date_cloture') - models.F('date_creation'))
+        ).values_list('duree', flat=True)
+        if durees:
+            moyenne_duree = sum([d.days for d in durees if hasattr(d, 'days')]) / len(durees)
 
     context = {
         'total_interventions': total_interventions,
@@ -32,6 +42,9 @@ def dashboard(request):
         'materiel_par_site': materiel_par_site,
         'interventions_par_type': interventions_par_type,
         'interventions_par_mois': interventions_par_mois,
+        'en_cours': en_cours,
+        'annulees': annulees,
+        'moyenne_duree': moyenne_duree,
     }
     return render(request, 'dashboard/dashboard.html', context)
 

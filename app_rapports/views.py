@@ -14,6 +14,7 @@ import logging
 from django.contrib.auth.decorators import login_required
 from django.conf import settings
 from app_interventions.models import Attachment
+from core.decorators import role_required
 
 logger = logging.getLogger(__name__)
 
@@ -25,10 +26,19 @@ class RapportListView(LoginRequiredMixin, ListView):
     def get_queryset(self):
         user_profile = getattr(self.request.user, 'profilutilisateur', None)
         qs = super().get_queryset()
-        # Exemple de filtrage par rôle (à adapter selon la logique métier)
+        # Filtres GET : date, client, technicien
+        date = self.request.GET.get('date')
+        client = self.request.GET.get('client')
+        technicien = self.request.GET.get('technicien')
+        if date:
+            qs = qs.filter(intervention__date=date)
+        if client:
+            qs = qs.filter(intervention__client_id=client)
+        if technicien:
+            qs = qs.filter(intervention__techniciens__id=technicien)
         if user_profile and user_profile.role == 'technicien':
-            return qs.filter(intervention__technicien__nom=self.request.user.username)
-        return qs
+            qs = qs.filter(intervention__techniciens__user=self.request.user)
+        return qs.distinct()
 
 class RapportCreateView(LoginRequiredMixin, CreateView):
     model = Rapport
@@ -66,28 +76,32 @@ class RapportDeleteView(LoginRequiredMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 @login_required
+@role_required('chef_projet')
 def rapport_pdf(request, pk):
-    rapport = get_object_or_404(Rapport, pk=pk)
-    intervention = rapport.intervention
-    checklist = intervention.checklist_items.all()
-    # Inclure tous les fichiers joints (Attachment + FichierJoint)
-    attachments = list(intervention.attachments.all()) + list(getattr(intervention, 'fichiers_joints', []).all() if hasattr(intervention, 'fichiers_joints') else [])
-    signature_url = intervention.signature_path.url if intervention.signature_path else None
-    html_string = render_to_string('app_rapports/rapport_pdf_template.html', {
-        'rapport': rapport,
-        'intervention': intervention,
-        'checklist': checklist,
-        'attachments': attachments,
-        'signature_url': signature_url,
-    })
-    with tempfile.NamedTemporaryFile(delete=True) as output:
-        HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf(output.name)
-        output.seek(0)
-        response = HttpResponse(output.read(), content_type='application/pdf')
-        response['Content-Disposition'] = f'filename=rapport_{rapport.pk}.pdf'
-        return response
+    try:
+        rapport = get_object_or_404(Rapport, pk=pk)
+        intervention = rapport.intervention
+        checklist = intervention.checklist_items.all()
+        attachments = list(intervention.attachments.all()) + list(getattr(intervention, 'fichiers_joints', []).all() if hasattr(intervention, 'fichiers_joints') else [])
+        signature_url = intervention.signature_path.url if intervention.signature_path else None
+        html_string = render_to_string('app_rapports/rapport_pdf_template.html', {
+            'rapport': rapport,
+            'intervention': intervention,
+            'checklist': checklist,
+            'attachments': attachments,
+            'signature_url': signature_url,
+        })
+        with tempfile.NamedTemporaryFile(delete=True) as output:
+            HTML(string=html_string, base_url=request.build_absolute_uri('/')).write_pdf(output.name)
+            output.seek(0)
+            response = HttpResponse(output.read(), content_type='application/pdf')
+            response['Content-Disposition'] = f'filename=rapport_{rapport.pk}.pdf'
+            return response
+    except Exception as e:
+        return HttpResponse(f"Erreur lors de la génération du PDF : {e}", status=500)
 
 @login_required
+@role_required('chef_projet')
 def generate_pdf(request, pk):
     rapport = get_object_or_404(Rapport, pk=pk)
     # Création auto du profil si absent

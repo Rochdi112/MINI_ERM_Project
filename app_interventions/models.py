@@ -15,11 +15,12 @@ class Intervention(models.Model):
         ('en_attente', 'En attente'),
         ('en_cours', 'En cours'),
         ('terminee', 'Terminée'),
+        ('annulee', 'Annulée'),
     ]
 
     client = models.ForeignKey(Client, on_delete=models.CASCADE, related_name="interventions", verbose_name="Client")
     materiel = models.ForeignKey(Materiel, on_delete=models.CASCADE, related_name="interventions", verbose_name="Matériel")
-    technicien = models.ForeignKey(Technicien, on_delete=models.CASCADE, default=1, related_name="interventions", verbose_name="Technicien")  # Ajout du default ici
+    techniciens = models.ManyToManyField(Technicien, related_name="interventions", verbose_name="Techniciens")
     site = models.ForeignKey(Site, on_delete=models.CASCADE, default=1, verbose_name="Site")  # Ajout d'un site par défaut pour migration
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
     statut = models.CharField(max_length=20, choices=STATUT_CHOICES, default='en_attente')
