@@ -5,11 +5,11 @@ from pathlib import Path
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 # === SÉCURITÉ ===
-SECRET_KEY = 'django-insecure-1234567890'  # Remplacer en prod
-DEBUG = True
-ALLOWED_HOSTS = []
+SECRET_KEY = os.environ.get('DJANGO_SECRET_KEY', 'django-insecure-1234567890')  # 🔐 À changer pour la production
+DEBUG = os.environ.get('DJANGO_DEBUG', '') == '1'
+ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '.onrender.com').split(',')
 
-# === APPS ===
+# === APPLICATIONS ===
 INSTALLED_APPS = [
     'django.contrib.admin',
     'django.contrib.auth',
@@ -38,14 +38,17 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-# === ROOT URL ===
+# WhiteNoise pour la gestion des fichiers statiques en production
+MIDDLEWARE.insert(1, 'whitenoise.middleware.WhiteNoiseMiddleware')
+
+# === URL PRINCIPALE ===
 ROOT_URLCONF = 'config.urls'
 
 # === TEMPLATES ===
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates'],  # ✅ Corrigé ici
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -61,7 +64,7 @@ TEMPLATES = [
 # === WSGI ===
 WSGI_APPLICATION = 'config.wsgi.application'
 
-# === DATABASE ===
+# === BASE DE DONNÉES ===
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
@@ -69,21 +72,56 @@ DATABASES = {
     }
 }
 
-# === AUTH ===
-AUTH_PASSWORD_VALIDATORS = []  # Tu peux ajouter des validateurs ici
+# Configuration DATABASES pour Render (PostgreSQL)
+import dj_database_url
+DATABASES['default'] = dj_database_url.config(default=os.environ.get('DATABASE_URL'))
 
-# === LOCALISATION ===
+# === AUTHENTIFICATION UTILISATEUR ===
+AUTH_PASSWORD_VALIDATORS = [
+    {
+        'NAME': 'django.contrib.auth.password_validation.UserAttributeSimilarityValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.MinimumLengthValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.CommonPasswordValidator',
+    },
+    {
+        'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
+    },
+]
+
+# === INTERNATIONALISATION ===
 LANGUAGE_CODE = 'fr-fr'
 TIME_ZONE = 'Africa/Casablanca'
 USE_I18N = True
 USE_TZ = True
 
-# === STATIC / MEDIA ===
+# === FICHIERS STATIQUES ===
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# === TAILLE MAX UPLOAD (par ex. pièces jointes PDF/photos) ===
+DATA_UPLOAD_MAX_MEMORY_SIZE = 52428800  # 50 Mo
+
+# Gestion des fichiers médias
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# === DEFAULT AUTO FIELD ===
-DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+# Gestion des logs minimaliste
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'root': {
+        'handlers': ['console'],
+        'level': 'WARNING',
+    },
+}

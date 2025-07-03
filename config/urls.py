@@ -5,9 +5,7 @@ from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', include('core.urls')),
-    path('', include('core.urls')),
-
+    path('', include('core.urls')),  # redirection accueil / tableau de bord
     path('clients/', include('app_clients.urls')),
     path('techniciens/', include('app_techniciens.urls')),
     path('interventions/', include('app_interventions.urls')),
@@ -15,6 +13,4 @@ urlpatterns = [
     path('rapports/', include('app_rapports.urls')),
 ]
 
-# Pour servir les fichiers media en dev
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

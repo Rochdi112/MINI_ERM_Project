@@ -1,35 +1,41 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import authenticate, login, logout
-from django.contrib.auth.decorators import login_required
+from django.shortcuts import render, redirect
+from django.contrib import messages
 from .forms import LoginForm
-from .models import ProfilUtilisateur
+from django.contrib.auth.decorators import login_required
+from django.db.models import Count, Q
+from app_interventions.models import Intervention
 
 def login_view(request):
+    if request.user.is_authenticated:
+        return redirect('dashboard')
+
     form = LoginForm(request.POST or None)
-    error = None
+    if request.method == 'POST' and form.is_valid():
+        username = form.cleaned_data['username']
+        password = form.cleaned_data['password']
+        user = authenticate(request, username=username, password=password)
+        if user:
+            login(request, user)
+            return redirect('dashboard')
+        else:
+            messages.error(request, "Nom d'utilisateur ou mot de passe invalide.")
 
-    if request.method == 'POST':
-        if form.is_valid():
-            user = authenticate(
-                request,
-                username=form.cleaned_data['username'],
-                password=form.cleaned_data['password']
-            )
-            if user:
-                login(request, user)
-                profil = ProfilUtilisateur.objects.get(user=user)
-                if profil.role == 'admin':
-                    return redirect('dashboard')
-                elif profil.role == 'technicien':
-                    return redirect('intervention_list')
-                else:
-                    return redirect('client_home')
-            else:
-                error = "Identifiants incorrects."
-
-    return render(request, 'core/login.html', {'form': form, 'error': error})
+    return render(request, 'core/login.html', {'form': form})
 
 @login_required
 def logout_view(request):
     logout(request)
     return redirect('login')
+
+@login_required
+def dashboard_view(request):
+    kpis = Intervention.objects.aggregate(
+        total=Count('id'),
+        en_cours=Count('id', filter=Q(statut='en_cours')),
+        en_retard=Count('id', filter=Q(statut='en_retard')),
+        a_venir=Count('id', filter=Q(statut='planifiée')),
+    )
+    if kpis['en_retard'] and kpis['en_retard'] > 5:
+        messages.warning(request, "Attention : de nombreuses interventions sont en retard !")
+    return render(request, 'dashboard.html', kpis)

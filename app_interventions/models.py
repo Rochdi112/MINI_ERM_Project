@@ -26,3 +26,19 @@ class Intervention(models.Model):
 
     def __str__(self):
         return f"{self.type} - {self.client.nom} ({self.statut})"
+
+class ChecklistItem(models.Model):
+    intervention = models.ForeignKey(Intervention, on_delete=models.CASCADE, related_name='checklist_items')
+    description = models.CharField(max_length=255)
+    completed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return f"{self.description} ({'✔' if self.completed else '✗'})"
+
+class Attachment(models.Model):
+    intervention = models.ForeignKey(Intervention, on_delete=models.CASCADE, related_name='attachments')
+    file = models.FileField(upload_to='attachments/')
+    uploaded_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Fichier pour intervention {self.intervention.id}"

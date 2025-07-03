@@ -1,0 +1,7 @@
+<li class="flex items-center gap-2 py-1">
+  <a href="{{ attachment.file.url }}" target="_blank" class="text-blue-600 underline">{{ attachment.file.name|basename }}</a>
+  <span class="text-xs text-gray-400">{{ attachment.uploaded_at|date:"d/m/Y H:i" }}</span>
+  {% if success %}
+    <span class="ml-2 text-green-600 font-bold">✓</span>
+  {% endif %}
+</li>

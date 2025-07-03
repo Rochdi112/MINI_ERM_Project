@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Fichiers joints pour l'intervention {{ intervention.id }}</h2>
+<div>
+  <form 
+    hx-post="{% url 'app_interventions:htmx_upload_attachment' intervention.id %}"
+    hx-target="#attachments-list"
+    hx-swap="beforeend"
+    enctype="multipart/form-data"
+    x-data="{progress: 0, loading: false}"
+    @htmx:beforeRequest="loading = true"
+    @htmx:afterRequest="loading = false; progress = 0"
+    @htmx:xhr:progress="progress = Math.round($event.detail.loaded / $event.detail.total * 100)"
+    class="flex flex-col gap-2"
+  >
+    {% csrf_token %}
+    {{ form.file }}
+    <button type="submit" class="btn btn-primary">Ajouter</button>
+    <template x-if="loading">
+      <progress max="100" x-bind:value="progress" class="w-full"></progress>
+    </template>
+  </form>
+  <ul id="attachments-list">
+    {% for att in attachments %}
+      {% include 'app_interventions/_attachment_item.html' with attachment=att %}
+    {% endfor %}
+  </ul>
+</div>
+<a href="{% url 'app_interventions:intervention_detail' intervention.id %}">Retour à l'intervention</a>
+{% endblock %}

@@ -5,3 +5,4 @@ psycopg2-binary
 sqlparse
 asgiref
 tzdata
+dj-database-url

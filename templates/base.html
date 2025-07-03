@@ -1,19 +1,64 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="fr" x-data>
 <head>
-  <!-- TailwindCSS -->
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}MINI_ERM_Project{% endblock %}</title>
   <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
-  <!-- Flowbite CSS -->
-  <link href="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.css" rel="stylesheet">
-  <title>{% block title %}Mini ERP{% endblock %}</title>
-</head>
-<body class="bg-gray-100">
-  <!-- Navbar/contenu -->
-  {% block content %}{% endblock %}
-  
-  <!-- scripts -->
   <script src="{% static 'js/htmx.min.js' %}"></script>
-  <script src="{% static 'js/alpine.min.js' %}"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/flowbite/2.2.1/flowbite.min.js"></script>
+  <script src="{% static 'js/alpine.min.js' %}" defer></script>
+  <!-- Flowbite -->
+  <link rel="stylesheet" href="https://unpkg.com/flowbite@2.3.0/dist/flowbite.min.css" />
+  <script src="https://unpkg.com/flowbite@2.3.0/dist/flowbite.min.js"></script>
+  {% block extra_head %}{% endblock %}
+</head>
+<body class="bg-gray-50 min-h-screen flex flex-col">
+
+  <!-- Navbar -->
+  <nav class="bg-white border-b border-gray-200 fixed w-full z-30">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between h-16">
+      <div class="flex items-center gap-2">
+        <img src="{% static 'img/logo.svg' %}" alt="Logo" class="h-8 w-8">
+        <span class="font-bold text-lg text-gray-800">MINI_ERM_Project</span>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="hidden sm:block text-gray-600">{{ request.user.username }}</span>
+        <button id="user-menu-button" data-dropdown-toggle="user-dropdown" class="flex items-center text-sm rounded-full focus:ring-2 focus:ring-blue-500">
+          <svg class="w-8 h-8 text-gray-400" fill="currentColor" viewBox="0 0 20 20"><path d="M10 10a4 4 0 100-8 4 4 0 000 8zm0 2a6 6 0 00-6 6v1h12v-1a6 6 0 00-6-6z"/></svg>
+        </button>
+        <div id="user-dropdown" class="hidden z-50 my-4 text-base list-none bg-white divide-y divide-gray-100 rounded shadow w-44">
+          <div class="px-4 py-3">
+            <span class="block text-sm text-gray-900">{{ request.user.username }}</span>
+            <span class="block text-sm font-medium text-gray-500 truncate">{{ request.user.email }}</span>
+          </div>
+          <ul class="py-1">
+            <li>
+              <a href="{% url 'logout' %}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Déconnexion</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Main content -->
+  <main class="flex-1 pt-20 pb-16">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <div class="col-span-1 lg:col-span-2">
+          {% block content %}{% endblock %}
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer sticky -->
+  <footer class="bg-white border-t border-gray-200 py-4 mt-auto w-full fixed bottom-0 left-0">
+    <div class="max-w-7xl mx-auto px-4 text-center text-gray-500 text-sm">
+      &copy; {{ now|date:'Y' }} MINI_ERM_Project. Tous droits réservés.
+    </div>
+  </footer>
+
+  {% block extra_body %}{% endblock %}
 </body>
 </html>

@@ -1,13 +1,12 @@
-from django.contrib.auth.models import User
 from django.db import models
+from django.contrib.auth.models import User
 
 class ProfilUtilisateur(models.Model):
-    ROLES = (
+    ROLES = [
         ('admin', 'Administrateur'),
         ('technicien', 'Technicien'),
         ('client', 'Client'),
-    )
-
+    ]
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     role = models.CharField(max_length=20, choices=ROLES)
 

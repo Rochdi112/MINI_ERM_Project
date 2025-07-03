@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Checklist pour l'intervention {{ intervention.id }}</h2>
+<ul>
+  {% for item in items %}
+    <li>
+      <input type="checkbox" {% if item.completed %}checked{% endif %} disabled>
+      {{ item.description }}
+    </li>
+  {% empty %}
+    <li>Aucun item dans la checklist.</li>
+  {% endfor %}
+</ul>
+<h3>Ajouter un item</h3>
+<form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit">Ajouter</button></form>
+<a href="{% url 'app_interventions:intervention_detail' intervention.id %}">Retour à l'intervention</a>
+{% endblock %}
