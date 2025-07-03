@@ -11,6 +11,7 @@ ALLOWED_HOSTS = os.environ.get('DJANGO_ALLOWED_HOSTS', '.onrender.com').split(',
 
 # === APPLICATIONS ===
 INSTALLED_APPS = [
+    'core.apps.CoreConfig',   # Activation de core avec ses models & signals
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
