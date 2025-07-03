@@ -20,7 +20,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
 
     # Apps du projet
-    'core',
     'app_clients',
     'app_techniciens',
     'app_interventions',

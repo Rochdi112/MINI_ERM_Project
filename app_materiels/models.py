@@ -2,7 +2,7 @@ from django.db import models
 from app_clients.models import Site
 
 class Materiel(models.Model):
-    site = models.ForeignKey(Site, on_delete=models.CASCADE, related_name="materiels", verbose_name="Site")
+    site = models.ForeignKey(Site, on_delete=models.CASCADE, default=1, related_name="materiels", verbose_name="Site")  # 👈 Ajout du default ici
     nom = models.CharField(max_length=100, verbose_name="Nom du matériel", blank=False, null=False)
     reference = models.CharField(max_length=100, verbose_name="Référence", blank=False, null=False)
     marque = models.CharField(max_length=100, verbose_name="Marque", blank=False, null=False)

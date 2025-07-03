@@ -1,5 +1,16 @@
+{% load static %}
 <div class="my-2">
-  <div class="rounded px-4 py-2 {{ 'bg-green-100 text-green-800' if type == 'success' else 'bg-red-100 text-red-800' }}">
-    {{ message }}
-  </div>
+  {% if message_type == 'success' %}
+    <div class="flex items-center p-4 mb-4 text-sm text-green-800 rounded-lg bg-green-100 dark:bg-gray-800 dark:text-green-400" role="alert">
+      <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"><path d="M16.707 5.293a1 1 0 0 0-1.414 0L9 11.586 6.707 9.293a1 1 0 0 0-1.414 1.414l3 3a1 1 0 0 0 1.414 0l7-7a1 1 0 0 0 0-1.414z"/></svg>
+      <span class="sr-only">Succès</span>
+      <div>{{ message }}</div>
+    </div>
+  {% else %}
+    <div class="flex items-center p-4 mb-4 text-sm text-red-800 rounded-lg bg-red-100 dark:bg-gray-800 dark:text-red-400" role="alert">
+      <svg class="flex-shrink-0 inline w-4 h-4 mr-3" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 20 20"><path d="M18 13a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h14a1 1 0 0 1 1 1v6zm-1-1V8H4v4h13z"/></svg>
+      <span class="sr-only">Erreur</span>
+      <div>{{ message }}</div>
+    </div>
+  {% endif %}
 </div>

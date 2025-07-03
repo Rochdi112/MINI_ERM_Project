@@ -7,8 +7,6 @@ from app_interventions.models import Intervention
 class BasicViewsTests(TestCase):
     def setUp(self):
         self.client = Client()
-
-        # Création de données fictives
         self.client_test = ClientModel.objects.create(nom="Client Test", adresse="Casablanca", contact="0661000000")
         self.technicien_test = Technicien.objects.create(nom="Technicien Test", specialite="HVAC")
 

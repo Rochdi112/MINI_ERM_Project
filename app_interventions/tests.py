@@ -1,4 +1,4 @@
-from django.test import TestCase, Client as DjangoClient
+from django.test import TestCase, Client as DjangoClient, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
 from app_interventions.models import Intervention, ChecklistItem
@@ -7,12 +7,15 @@ from app_techniciens.models import Technicien
 from app_materiels.models import Materiel
 from datetime import date
 from django.utils import timezone
+from django.core.files.uploadedfile import SimpleUploadedFile
+from app_interventions.models import Attachment
 
 class HTMXInterventionsTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user(username='tech', password='pass')
-        self.user.profilutilisateur.role = 'technicien'
-        self.user.profilutilisateur.save()
+        # Créer un profil utilisateur technicien pour l'utilisateur de test
+        from core.models import ProfilUtilisateur
+        ProfilUtilisateur.objects.get_or_create(user=self.user, defaults={'role': 'technicien'})
         client = ClientModel.objects.create(nom='C', email='c@c.com', telephone='1')
         site = Site.objects.create(client=client, nom='S', adresse='A')
         materiel = Materiel.objects.create(site=site, nom='M', reference='R', marque='X', date_installation='2024-01-01')
@@ -54,6 +57,7 @@ class HTMXInterventionsTests(TestCase):
         url = reverse('app_interventions:htmx-filter')
         self.client.login(username='tech', password='pass')
         response = self.client.get(url, HTTP_HX_REQUEST='true')
+        # On attend un code 200 si l'utilisateur est technicien et la requête est HTMX
         self.assertEqual(response.status_code, 200)
         self.assertNotIn('<html', response.content.decode())
         self.assertNotIn('<body', response.content.decode())
@@ -63,6 +67,7 @@ class HTMXInterventionsTests(TestCase):
         url = reverse('app_interventions:htmx-modal-form')
         self.client.login(username='tech', password='pass')
         response = self.client.get(url, HTTP_HX_REQUEST='true')
+        # On attend un code 200 si l'utilisateur est technicien et la requête est HTMX
         self.assertEqual(response.status_code, 200)
         self.assertIn('form', response.content.decode())
         self.assertNotIn('<html', response.content.decode())
@@ -71,6 +76,7 @@ class HTMXInterventionsTests(TestCase):
         url = reverse('app_interventions:htmx-modal-form')
         self.client.login(username='tech', password='pass')
         response = self.client.post(url, {}, HTTP_HX_REQUEST='true')
+        # On attend un code 200 même si le formulaire est invalide (retourne le formulaire avec erreurs)
         self.assertEqual(response.status_code, 200)
         self.assertIn('form', response.content.decode())
         self.assertIn('Veuillez corriger', response.content.decode())
@@ -88,6 +94,7 @@ class HTMXInterventionsTests(TestCase):
             'date': '2024-01-01',
         }
         response = self.client.post(url, data, HTTP_HX_REQUEST='true')
+        # On attend un code 200 si tout est valide
         self.assertEqual(response.status_code, 200)
         self.assertIn('succès', response.content.decode())
         self.assertNotIn('<html', response.content.decode())
@@ -158,6 +165,7 @@ class HTMXInterventionsTests(TestCase):
             }
             resp = self.client.post(reverse('app_interventions:intervention_create'), data)
             self.assertEqual(resp.status_code, 302)
+            # Un objet existe déjà via setUp, on en crée un second
             self.assertEqual(Intervention.objects.count(), 2)
         def test_update_view(self):
             data = {
@@ -174,6 +182,7 @@ class HTMXInterventionsTests(TestCase):
         def test_delete_view(self):
             resp = self.client.post(reverse('app_interventions:intervention_delete', args=[self.intervention.pk]))
             self.assertEqual(resp.status_code, 302)
+            # Après suppression, il ne doit plus rester aucun objet
             self.assertEqual(Intervention.objects.count(), 0)
         def test_permission_denied(self):
             # Simule un technicien non assigné

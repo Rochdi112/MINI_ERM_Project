@@ -23,7 +23,6 @@ urlpatterns = [
     path('<int:pk>/attachments/', upload_attachment, name='attachment_upload'),
     path('checklist/item/<int:pk>/edit/', checklist_item_update, name='checklist_item_update'),
     path('<int:pk>/htmx-upload/', htmx_upload_attachment, name='htmx_upload_attachment'),
-    path('<int:pk>/htmx-checklist-item/', htmx_checklist_toggle, name='htmx_checklist_toggle'),
     path('<int:pk>/htmx-checklist-item/', views.toggle_checklist_item_htmx, name='htmx-checklist-item'),
     path('htmx-filter/', views.filter_interventions_htmx, name='htmx-filter'),
     path('htmx-modal-form/', views.modal_form_intervention_htmx, name='htmx-modal-form'),

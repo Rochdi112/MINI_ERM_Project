@@ -6,8 +6,9 @@ import logging
 from django.views.generic import ListView, CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
-from .models import Intervention, ChecklistItem, Attachment, FichierJoint
-from .forms import InterventionForm, ChecklistItemForm, AttachmentForm
+from .models import Intervention, ChecklistItem, FichierJoint
+from .forms import InterventionForm, ChecklistItemForm
+from .forms_attachment import AttachmentForm
 from core.models import ProfilUtilisateur
 from django.views.decorators.http import require_POST
 

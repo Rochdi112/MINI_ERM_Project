@@ -2,8 +2,10 @@ from django.db import models
 
 class Client(models.Model):
     nom = models.CharField(max_length=100, verbose_name="Nom", blank=False, null=False)
-    email = models.EmailField(verbose_name="Email", blank=False, null=False)
-    telephone = models.CharField(max_length=30, verbose_name="Téléphone", blank=False, null=False)
+    adresse = models.CharField(max_length=255, verbose_name="Adresse", blank=True, null=True)
+    contact = models.CharField(max_length=100, verbose_name="Contact", blank=True, null=True)
+    email = models.EmailField(verbose_name="Email", blank=True, null=True)
+    telephone = models.CharField(max_length=30, verbose_name="Téléphone", blank=True, null=True)
 
     class Meta:
         verbose_name = "Client"
