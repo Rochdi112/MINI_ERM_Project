@@ -1,17 +1,28 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Checklist pour l'intervention {{ intervention.id }}</h2>
-<ul>
-  {% for item in items %}
-    <li>
-      <input type="checkbox" {% if item.completed %}checked{% endif %} disabled>
-      {{ item.description }}
-    </li>
-  {% empty %}
-    <li>Aucun item dans la checklist.</li>
-  {% endfor %}
-</ul>
-<h3>Ajouter un item</h3>
-<form method="post">{% csrf_token %}{{ form.as_p }}<button type="submit">Ajouter</button></form>
-<a href="{% url 'app_interventions:intervention_detail' intervention.id %}">Retour à l'intervention</a>
+<div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow space-y-4">
+  <h2 class="text-xl font-bold text-gray-900 dark:text-white">Checklist : {{ checklist.nom }}</h2>
+
+  <ul class="space-y-3" id="checklist-items">
+    {% for item in checklist.items.all %}
+      {% include "app_interventions/_checklist_item.html" with item=item %}
+    {% empty %}
+      <li class="text-gray-400 italic">Aucun élément pour cette checklist.</li>
+    {% endfor %}
+  </ul>
+
+  <form hx-post="{% url 'checklist-item-add' checklist.id %}"
+        hx-target="#checklist-items"
+        hx-swap="beforeend"
+        class="flex items-center space-x-2 pt-4">
+    {% csrf_token %}
+    <input type="text" name="nom" placeholder="Nouvel item"
+           required
+           class="flex-grow p-2 border border-gray-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white">
+    <button type="submit"
+            class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-4 py-2">
+      <i class="fas fa-plus mr-1"></i> Ajouter
+    </button>
+  </form>
+</div>
 {% endblock %}

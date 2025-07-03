@@ -1,28 +1,20 @@
 {% load static %}
 <!DOCTYPE html>
-<html lang="fr" x-data>
+<html lang="fr" class="dark">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{% block title %}MINI_ERM_Project{% endblock %}</title>
-  <link href="{% static 'css/tailwind.css' %}" rel="stylesheet">
-  <script src="{% static 'js/htmx.min.js' %}"></script>
-  <script src="{% static 'js/alpine.min.js' %}" defer></script>
-  <!-- Flowbite -->
-  <link rel="stylesheet" href="https://unpkg.com/flowbite@2.3.0/dist/flowbite.min.css" />
-  <script src="https://unpkg.com/flowbite@2.3.0/dist/flowbite.min.js"></script>
-  {% block extra_head %}{% endblock %}
+  <title>{% block title %}MIF ERP{% endblock %}</title>
+  <link href="{% static 'css/output.css' %}" rel="stylesheet">
+  <script src="https://unpkg.com/htmx.org@1.9.10" defer></script>
+  <script src="https://unpkg.com/flowbite@2.3.0/dist/flowbite.min.js" defer></script>
 </head>
-<body class="bg-gray-50 min-h-screen flex flex-col">
+<body class="bg-gray-50 dark:bg-gray-900">
   {% include 'components/_navbar.html' %}
-  <main class="flex-1 pt-20 max-w-7xl mx-auto w-full px-4">
-    {% if messages %}
-      {% for message in messages %}
-        {% include 'components/_alert.html' with message=message message_type=message.tags %}
-      {% endfor %}
-    {% endif %}
+
+  <main class="p-4 max-w-screen-xl mx-auto">
+    {% include 'components/_alert.html' %}
     {% block content %}{% endblock %}
   </main>
-  {% block extra_body %}{% endblock %}
 </body>
 </html>

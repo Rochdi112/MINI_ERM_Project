@@ -1,32 +1,48 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2 class="text-2xl font-bold mb-4">Liste des sites</h2>
-<a href="{% url 'app_clients:site_create' %}" class="inline-block mb-2 px-4 py-2 text-white bg-green-600 rounded hover:bg-green-700">Nouveau site</a>
-<div class="overflow-x-auto">
-<table class="min-w-full text-sm text-left text-gray-500 border rounded-lg">
-    <thead class="text-xs text-gray-700 uppercase bg-gray-100">
-        <tr>
-            <th scope="col" class="px-6 py-3">Nom</th>
-            <th scope="col" class="px-6 py-3">Adresse</th>
-            <th scope="col" class="px-6 py-3">Client</th>
-            <th scope="col" class="px-6 py-3">Actions</th>
-        </tr>
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
+  <div class="flex justify-between items-center pb-4 bg-white dark:bg-gray-900">
+    <button 
+      hx-get="{% url 'app_clients:site_create' %}" 
+      hx-target="#modal-content"
+      data-modal-target="siteModal" 
+      data-modal-toggle="siteModal"
+      class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">
+      <i class="fas fa-plus mr-2"></i> Ajouter Site
+    </button>
+  </div>
+
+  <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th class="px-6 py-3">Nom</th>
+        <th class="px-6 py-3">Adresse</th>
+        <th class="px-6 py-3">Client</th>
+        <th class="px-6 py-3 text-right">Actions</th>
+      </tr>
     </thead>
     <tbody>
-        {% for site in sites %}
-        <tr class="bg-white border-b hover:bg-gray-50">
-            <td class="px-6 py-4">{{ site.nom }}</td>
-            <td class="px-6 py-4">{{ site.adresse }}</td>
-            <td class="px-6 py-4">{{ site.client.nom }}</td>
-            <td class="px-6 py-4 space-x-2">
-                <a href="{% url 'app_clients:site_update' site.pk %}" class="inline-block px-3 py-1 text-xs text-white bg-yellow-500 rounded hover:bg-yellow-600">Modifier</a>
-                <a href="{% url 'app_clients:site_delete' site.pk %}" class="inline-block px-3 py-1 text-xs text-white bg-red-600 rounded hover:bg-red-700">Supprimer</a>
-            </td>
-        </tr>
-        {% empty %}
-        <tr><td colspan="4" class="px-6 py-4 text-center">Aucun site enregistré.</td></tr>
-        {% endfor %}
+      {% for site in sites %}
+      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <td class="px-6 py-4">{{ site.nom }}</td>
+        <td class="px-6 py-4">{{ site.adresse }}</td>
+        <td class="px-6 py-4">{{ site.client }}</td>
+        <td class="px-6 py-4 text-right">
+          <button hx-get="{% url 'app_clients:site_update' site.id %}" hx-target="#modal-content"
+                  data-modal-target="siteModal" data-modal-toggle="siteModal"
+                  class="text-blue-600 hover:underline mr-2">
+            Modifier
+          </button>
+          <button hx-post="{% url 'app_clients:site_delete' site.id %}" hx-target="closest tr" hx-confirm="Supprimer ce site ?"
+                  class="text-red-600 hover:underline">
+            Supprimer
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
-</table>
+  </table>
 </div>
+
+{% include 'app_clients/site_modal.html' %}
 {% endblock %}

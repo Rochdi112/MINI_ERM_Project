@@ -1,7 +1,21 @@
-<li class="flex items-center gap-2 py-1">
-  <a href="{{ attachment.file.url }}" target="_blank" class="text-blue-600 underline">{{ attachment.file.name|basename }}</a>
-  <span class="text-xs text-gray-400">{{ attachment.uploaded_at|date:"d/m/Y H:i" }}</span>
-  {% if success %}
-    <span class="ml-2 text-green-600 font-bold">✓</span>
-  {% endif %}
-</li>
+<div class="flex items-center justify-between p-3 bg-gray-50 border rounded-lg dark:bg-gray-700 dark:border-gray-600">
+  <div class="flex items-center space-x-3">
+    {% if piece.extension == 'pdf' %}
+      <i class="fas fa-file-pdf text-red-600 text-xl"></i>
+    {% else %}
+      <i class="fas fa-file-image text-blue-500 text-xl"></i>
+    {% endif %}
+    <a href="{{ piece.fichier.url }}" target="_blank"
+       class="text-sm font-medium text-blue-700 dark:text-blue-300 hover:underline">
+      {{ piece.nom|default:piece.fichier.name }}
+    </a>
+  </div>
+
+  <button hx-post="{% url 'attachment-delete' piece.id %}"
+          hx-target="closest div"
+          hx-swap="outerHTML swap:1s"
+          hx-confirm="Supprimer cette pièce ?"
+          class="text-red-600 hover:text-red-800">
+    <i class="fas fa-trash"></i>
+  </button>
+</div>

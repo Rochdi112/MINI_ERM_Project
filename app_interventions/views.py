@@ -235,8 +235,15 @@ def toggle_checklist_item_htmx(request, pk):
     if not getattr(request, 'htmx', False):
         return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Requête non autorisée.'}, status=403)
     item = get_object_or_404(ChecklistItem, pk=pk)
+    # Création auto du profil si absent
+    if not hasattr(request.user, 'profilutilisateur'):
+        from core.models import ProfilUtilisateur
+        ProfilUtilisateur.objects.create(user=request.user, role='technicien')
     user_profile = getattr(request.user, 'profilutilisateur', None)
-    if not (user_profile and (user_profile.role == 'admin' or (item.intervention.technicien and item.intervention.technicien.nom == request.user.username))):
+    is_technicien = False
+    if item.intervention.technicien and hasattr(item.intervention.technicien, 'user'):
+        is_technicien = item.intervention.technicien.user_id == request.user.id
+    if not (user_profile and (user_profile.role == 'admin' or is_technicien)):
         return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Accès refusé.'}, status=403)
     try:
         item.completed = not item.completed
@@ -250,6 +257,9 @@ def toggle_checklist_item_htmx(request, pk):
 def filter_interventions_htmx(request):
     if not getattr(request, 'htmx', False):
         return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Requête non autorisée.'}, status=403)
+    if not hasattr(request.user, 'profilutilisateur'):
+        from core.models import ProfilUtilisateur
+        ProfilUtilisateur.objects.create(user=request.user, role='technicien')
     user_profile = getattr(request.user, 'profilutilisateur', None)
     qs = Intervention.objects.all()
     client_id = request.GET.get('client')
@@ -261,15 +271,17 @@ def filter_interventions_htmx(request):
         qs = qs.filter(site_id=site_id)
     if materiel_id:
         qs = qs.filter(materiel_id=materiel_id)
-    # Filtrage par rôle
     if user_profile and user_profile.role == 'technicien':
-        qs = qs.filter(technicien__nom=request.user.username)
+        qs = qs.filter(technicien__user_id=request.user.id)
     return render(request, 'app_interventions/_filter_select.html', {'interventions': qs})
 
 @login_required
 def modal_form_intervention_htmx(request):
     if not getattr(request, 'htmx', False):
         return render(request, 'components/_alert.html', {'type': 'error', 'message': 'Requête non autorisée.'}, status=403)
+    if not hasattr(request.user, 'profilutilisateur'):
+        from core.models import ProfilUtilisateur
+        ProfilUtilisateur.objects.create(user=request.user, role='technicien')
     user_profile = getattr(request.user, 'profilutilisateur', None)
     if request.method == 'POST':
         form = InterventionForm(request.POST)

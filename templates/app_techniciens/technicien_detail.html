@@ -1,5 +1,28 @@
 {% extends 'base.html' %}
-{% block title %}Technicien detail{% endblock %}
 {% block content %}
-<h2>Technicien detail</h2>
+<div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow space-y-4 max-w-3xl mx-auto">
+  <h2 class="text-xl font-bold text-gray-900 dark:text-white">Fiche technicien</h2>
+
+  <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4 text-sm text-gray-700 dark:text-gray-300">
+    <div>
+      <dt class="font-medium">Nom</dt>
+      <dd>{{ technicien.nom }}</dd>
+    </div>
+    <div>
+      <dt class="font-medium">Spécialité</dt>
+      <dd>{{ technicien.specialite }}</dd>
+    </div>
+    <div>
+      <dt class="font-medium">Téléphone</dt>
+      <dd>{{ technicien.telephone }}</dd>
+    </div>
+  </dl>
+
+  <div class="pt-4 flex justify-end">
+    <a href="{% url 'app_techniciens:technicien_list' %}"
+       class="text-gray-700 bg-gray-100 border border-gray-300 hover:bg-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">
+      Retour
+    </a>
+  </div>
+</div>
 {% endblock %}

@@ -1,10 +1,21 @@
-<li id="checklist-item-{{ item.id }}" class="flex items-center gap-2 py-1">
-  <button hx-post="{% url 'app_interventions:htmx_checklist_toggle' item.id %}" hx-target="#checklist-item-{{ item.id }}" hx-swap="outerHTML" class="text-xl">
-    {% if item.completed %}
-      <span class="text-green-600">✔</span>
-    {% else %}
-      <span class="text-gray-400">✗</span>
-    {% endif %}
-  </button>
-  <span class="ml-2">{{ item.description }}</span>
+<li class="flex items-center justify-between p-3 border rounded-lg
+           {% if item.fait %}
+             border-green-300 bg-green-50 dark:bg-green-900
+           {% else %}
+             border-gray-200 bg-gray-50 dark:bg-gray-800
+           {% endif %}">
+  <label class="flex items-center space-x-2">
+    <input type="checkbox"
+           class="h-5 w-5 text-green-600 rounded focus:ring-green-500"
+           {% if item.fait %}checked{% endif %}
+           hx-post="{% url 'checklist-item-toggle' item.id %}"
+           hx-target="closest li"
+           hx-swap="outerHTML">
+    <span class="{% if item.fait %}line-through text-gray-500{% else %}text-gray-900 dark:text-white{% endif %}">
+      {{ item.nom }}
+    </span>
+  </label>
+  {% if item.commentaire %}
+    <span class="text-sm italic text-gray-500 dark:text-gray-400 ml-2">{{ item.commentaire }}</span>
+  {% endif %}
 </li>

@@ -1,13 +1,29 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2 class="text-2xl font-bold mb-4">Créer ou modifier un site</h2>
-<form method="post" class="space-y-4">{% csrf_token %}
-    <div class="space-y-2">
-        {{ form.as_p }}
+<form method="post" hx-post="{% url 'app_clients:site_create' %}" hx-target="#site-table" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="grid gap-6 mb-6 md:grid-cols-2">
+    <div>
+      <label for="nom" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nom Site</label>
+      <input type="text" name="nom" id="nom" value="{{ form.nom.value }}"
+             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
     </div>
-    <div class="flex space-x-2">
-        <button type="submit" class="px-4 py-2 text-white bg-blue-600 rounded hover:bg-blue-700 focus:ring-4 focus:ring-blue-300">Enregistrer</button>
-        <a href="{% url 'app_clients:site_list' %}" class="px-4 py-2 text-gray-700 bg-gray-200 rounded hover:bg-gray-300">Annuler</a>
+    <div>
+      <label for="adresse" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Adresse</label>
+      <input type="text" name="adresse" id="adresse" value="{{ form.adresse.value }}"
+             class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg block w-full p-2.5">
     </div>
+  </div>
+  <div>
+    <label for="client" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Client</label>
+    {{ form.client }}
+  </div>
+  <div class="flex justify-end space-x-2 mt-4">
+    <button type="submit"
+            class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">
+      Enregistrer
+    </button>
+    <button type="button" data-modal-hide="siteModal"
+            class="text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5">
+      Annuler
+    </button>
+  </div>
 </form>
-{% endblock %}

@@ -1,0 +1,10 @@
+<div class="mb-4">
+  <select name="{{ name }}" id="{{ name }}"
+          class="border border-gray-300 text-sm rounded-lg p-2.5 dark:bg-gray-700 dark:text-white"
+          hx-get="{{ url }}" hx-target="{{ target }}" hx-trigger="change">
+    <option value="">{{ placeholder }}</option>
+    {% for value, label in options %}
+      <option value="{{ value }}" {% if selected == value %}selected{% endif %}>{{ label }}</option>
+    {% endfor %}
+  </select>
+</div>

@@ -1,5 +1,28 @@
-{% extends 'base.html' %}
-{% block title %}Rapport form{% endblock %}
-{% block content %}
-<h2>Rapport form</h2>
-{% endblock %}
+<form method="post" hx-post="{% url 'app_rapports:rapport_create' %}" hx-target="#rapport-table" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="space-y-4">
+    <div>
+      <label for="intervention" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Intervention</label>
+      {{ form.intervention }}
+    </div>
+    <div>
+      <label for="date" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Date</label>
+      {{ form.date }}
+    </div>
+    <div>
+      <label for="description" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Description</label>
+      {{ form.description }}
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-2 mt-6">
+    <button type="submit"
+            class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">
+      Enregistrer
+    </button>
+    <a href="{% url 'app_rapports:rapport_list' %}"
+       class="text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5">
+      Annuler
+    </a>
+  </div>
+</form>

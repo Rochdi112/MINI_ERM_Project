@@ -1,5 +1,26 @@
 {% extends 'base.html' %}
-{% block title %}Materiel detail{% endblock %}
 {% block content %}
-<h2>Materiel detail</h2>
+<div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md space-y-6 max-w-4xl mx-auto">
+  <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Détails du matériel</h2>
+  <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm text-gray-700 dark:text-gray-300">
+    <div>
+      <dt class="font-medium">Nom</dt>
+      <dd>{{ materiel.nom }}</dd>
+    </div>
+    <div>
+      <dt class="font-medium">Type</dt>
+      <dd>{{ materiel.type }}</dd>
+    </div>
+    <div>
+      <dt class="font-medium">Site</dt>
+      <dd>{{ materiel.site }}</dd>
+    </div>
+  </dl>
+  <div class="flex justify-end pt-4">
+    <a href="{% url 'app_materiels:materiel_list' %}"
+       class="text-gray-700 bg-gray-100 border border-gray-300 hover:bg-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">
+      Retour
+    </a>
+  </div>
+</div>
 {% endblock %}

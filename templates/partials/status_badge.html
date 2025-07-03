@@ -1,0 +1,8 @@
+{# Badge de statut pour interventions, réutilisable #}
+<span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium
+  {% if statut == 'prevue' %}bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300
+  {% elif statut == 'en_cours' %}bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300
+  {% elif statut == 'cloturee' %}bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300
+  {% else %}bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-300{% endif %}">
+  {{ statut|capfirst }}
+</span>

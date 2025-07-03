@@ -1,30 +1,29 @@
-{% extends 'base.html' %}
-{% block content %}
-<h2>Fichiers joints pour l'intervention {{ intervention.id }}</h2>
-<div>
-  <form 
-    hx-post="{% url 'app_interventions:htmx_upload_attachment' intervention.id %}"
-    hx-target="#attachments-list"
-    hx-swap="beforeend"
-    enctype="multipart/form-data"
-    x-data="{progress: 0, loading: false}"
-    @htmx:beforeRequest="loading = true"
-    @htmx:afterRequest="loading = false; progress = 0"
-    @htmx:xhr:progress="progress = Math.round($event.detail.loaded / $event.detail.total * 100)"
-    class="flex flex-col gap-2"
-  >
+<div class="p-4 bg-white dark:bg-gray-800 rounded-lg shadow space-y-4">
+  <h3 class="text-lg font-semibold text-gray-900 dark:text-white">Ajouter une pièce jointe</h3>
+
+  <form hx-post="{% url 'attachment-upload' intervention.id %}"
+        hx-target="#attachments-list"
+        hx-swap="beforeend"
+        enctype="multipart/form-data"
+        class="flex items-center space-x-3">
     {% csrf_token %}
-    {{ form.file }}
-    <button type="submit" class="btn btn-primary">Ajouter</button>
-    <template x-if="loading">
-      <progress max="100" x-bind:value="progress" class="w-full"></progress>
-    </template>
+    <input type="file" name="fichier" accept="image/*,application/pdf"
+           class="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4
+                  file:rounded-lg file:border-0 file:text-sm file:font-semibold
+                  file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100
+                  dark:file:bg-gray-700 dark:file:text-white">
+
+    <button type="submit"
+            class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-4 py-2">
+      <i class="fas fa-upload mr-1"></i> Ajouter
+    </button>
   </form>
-  <ul id="attachments-list">
-    {% for att in attachments %}
-      {% include 'app_interventions/_attachment_item.html' with attachment=att %}
+
+  <div id="attachments-list" class="space-y-3">
+    {% for piece in intervention.pieces_jointes.all %}
+      {% include "app_interventions/_attachment_item.html" with piece=piece %}
+    {% empty %}
+      <p class="text-gray-400 italic">Aucune pièce jointe.</p>
     {% endfor %}
-  </ul>
+  </div>
 </div>
-<a href="{% url 'app_interventions:intervention_detail' intervention.id %}">Retour à l'intervention</a>
-{% endblock %}

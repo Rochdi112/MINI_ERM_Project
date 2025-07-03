@@ -1,59 +1,43 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
 {% block content %}
-<h2>Tableau de bord</h2>
-<div class="row">
-  <div class="col-md-3"><div class="card"><div class="card-body"><h5>Total interventions</h5><p>{{ total_interventions }}</p></div></div></div>
-  <div class="col-md-3"><div class="card"><div class="card-body"><h5>Taux de clôture</h5><p>{{ taux_cloture|floatformat:1 }} %</p></div></div></div>
-  <div class="col-md-3"><div class="card"><div class="card-body"><h5>Techniciens actifs</h5><p>{{ techniciens_actifs }}</p></div></div></div>
-</div>
-<hr>
-<div class="row">
-  <div class="col-md-6">
-    <canvas id="typeChart"></canvas>
+<div class="p-4 space-y-8">
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4" id="kpi-cards">
+    {% include 'dashboard/_kpi_fragment.html' %}
   </div>
-  <div class="col-md-6">
-    <canvas id="moisChart"></canvas>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Derniers rapports</h3>
+      <ul class="space-y-3 max-h-[280px] overflow-y-auto">
+        {% for rapport in derniers_rapports %}
+        <li class="text-sm text-gray-700 dark:text-gray-300">
+          <span class="font-medium">{{ rapport.intervention.client }}</span> –
+          {{ rapport.date|date:"d/m/Y" }} :
+          <span class="italic text-gray-500 truncate">{{ rapport.resume|truncatechars:50 }}</span>
+        </li>
+        {% empty %}
+        <li class="text-gray-400">Aucun rapport disponible.</li>
+        {% endfor %}
+      </ul>
+    </div>
+    <div class="bg-white dark:bg-gray-800 shadow rounded-lg p-6">
+      <h3 class="text-lg font-semibold text-gray-900 dark:text-white mb-4">Prochaines interventions</h3>
+      <ul class="divide-y divide-gray-200 dark:divide-gray-700 max-h-[280px] overflow-y-auto">
+        {% for intervention in prochaines_interventions %}
+        <li class="py-3 flex justify-between items-center">
+          <div>
+            <p class="text-sm font-medium text-gray-900 dark:text-white">{{ intervention.client }}</p>
+            <p class="text-xs text-gray-500 dark:text-gray-400">
+              {{ intervention.date|date:"d/m/Y" }} — {{ intervention.get_type_display }}
+            </p>
+          </div>
+          {% include 'partials/status_badge.html' with statut=intervention.statut %}
+        </li>
+        {% empty %}
+        <li class="py-3 text-gray-400">Aucune intervention prévue.</li>
+        {% endfor %}
+      </ul>
+    </div>
   </div>
 </div>
-<hr>
-<h4>Matériel par site</h4>
-<table class="table table-bordered">
-  <thead><tr><th>Site</th><th>Nombre de matériels</th></tr></thead>
-  <tbody>
-    {% for nom, nb in materiel_par_site %}
-      <tr><td>{{ nom }}</td><td>{{ nb }}</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-const typeLabels = [{% for t in interventions_par_type %}"{{ t.type }}"{% if not forloop.last %},{% endif %}{% endfor %}];
-const typeData = [{% for t in interventions_par_type %}{{ t.count }}{% if not forloop.last %},{% endif %}{% endfor %}];
-const ctxType = document.getElementById('typeChart').getContext('2d');
-new Chart(ctxType, {
-  type: 'pie',
-  data: {
-    labels: typeLabels,
-    datasets: [{
-      label: 'Interventions par type',
-      data: typeData,
-      backgroundColor: ['#36a2eb', '#ff6384', '#ffce56'],
-    }]
-  }
-});
-const moisLabels = [{% for m in interventions_par_mois %}"{{ m.mois }}"{% if not forloop.last %},{% endif %}{% endfor %}];
-const moisData = [{% for m in interventions_par_mois %}{{ m.count }}{% if not forloop.last %},{% endif %}{% endfor %}];
-const ctxMois = document.getElementById('moisChart').getContext('2d');
-new Chart(ctxMois, {
-  type: 'bar',
-  data: {
-    labels: moisLabels,
-    datasets: [{
-      label: 'Interventions par mois',
-      data: moisData,
-      backgroundColor: '#36a2eb',
-    }]
-  }
-});
-</script>
 {% endblock %}

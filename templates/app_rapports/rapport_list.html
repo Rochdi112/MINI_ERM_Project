@@ -1,5 +1,45 @@
-{% extends 'base.html' %}
-{% block title %}Rapport list{% endblock %}
-{% block content %}
-<h2>Rapport list</h2>
-{% endblock %}
+<div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow space-y-4">
+  <div class="flex justify-between items-center">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Rapports d’intervention</h2>
+  </div>
+
+  <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    <thead class="text-xs bg-gray-50 dark:bg-gray-700 dark:text-gray-300 uppercase">
+      <tr>
+        <th class="px-6 py-3">Intervention</th>
+        <th class="px-6 py-3">Date</th>
+        <th class="px-6 py-3">Résumé</th>
+        <th class="px-6 py-3 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for rapport in rapports %}
+      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <td class="px-6 py-4">{{ rapport.intervention }}</td>
+        <td class="px-6 py-4">{{ rapport.date|date:"d/m/Y" }}</td>
+        <td class="px-6 py-4 text-sm text-gray-700 dark:text-gray-300">
+          {{ rapport.resume|truncatechars:60 }}
+        </td>
+        <td class="px-6 py-4 text-right space-x-2">
+          <a href="{% url 'app_rapports:rapport_pdf' rapport.id %}"
+             class="text-blue-600 hover:underline">
+            <i class="fas fa-eye"></i>
+          </a>
+          <button
+            hx-get="{% url 'app_rapports:generate_pdf' rapport.id %}"
+            hx-indicator="#spinner-rapport-{{ rapport.id }}"
+            class="text-red-600 hover:text-red-800">
+            <i class="fas fa-file-pdf"></i>
+            <svg id="spinner-rapport-{{ rapport.id }}" class="ml-2 w-4 h-4 text-red-500 animate-spin hidden"
+                 xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor"
+                    d="M4 12a8 8 0 018-8v8H4z"></path>
+            </svg>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>

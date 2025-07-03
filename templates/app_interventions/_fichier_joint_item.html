@@ -1,3 +1,7 @@
-<li>
-  <a href="{{ joint.fichier.url }}" target="_blank">{{ joint.fichier.name }}</a> (uploadé le {{ joint.uploaded_at|date:'d/m/Y H:i' }})
+<li class="flex items-center justify-between p-2 bg-gray-100 rounded dark:bg-gray-700">
+  <a href="{{ fichier.fichier.url }}" target="_blank"
+     class="text-sm text-blue-700 dark:text-blue-300 hover:underline">
+    {{ fichier.nom }}
+  </a>
+  <span class="text-xs text-gray-500 dark:text-gray-400">{{ fichier.fichier.size|filesizeformat }}</span>
 </li>

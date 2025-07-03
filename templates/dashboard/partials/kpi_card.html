@@ -1,0 +1,10 @@
+{# Fragment KPI Card pour le dashboard #}
+<div class="bg-{{ color }}-100 dark:bg-{{ color }}-900 p-4 rounded-lg flex items-center space-x-4 shadow">
+  <div class="text-{{ color }}-600 dark:text-{{ color }}-300">
+    <i class="fas fa-{{ icon }} fa-2x"></i>
+  </div>
+  <div>
+    <div class="text-lg font-bold">{{ value }}</div>
+    <div class="text-sm text-gray-500 dark:text-gray-300">{{ label }}</div>
+  </div>
+</div>

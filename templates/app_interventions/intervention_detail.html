@@ -1,5 +1,42 @@
 {% extends 'base.html' %}
-{% block title %}Intervention detail{% endblock %}
 {% block content %}
-<h2>Intervention detail</h2>
+<div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md space-y-6 max-w-4xl mx-auto">
+  <h2 class="text-2xl font-bold text-gray-900 dark:text-white">Détails de l’intervention</h2>
+
+  <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm text-gray-700 dark:text-gray-300">
+    <div>
+      <dt class="font-medium">Client</dt>
+      <dd>{{ intervention.client }}</dd>
+    </div>
+    <div>
+      <dt class="font-medium">Technicien</dt>
+      <dd>{{ intervention.technicien }}</dd>
+    </div>
+    <div>
+      <dt class="font-medium">Type</dt>
+      <dd>{{ intervention.get_type_display }}</dd>
+    </div>
+    <div>
+      <dt class="font-medium">Date</dt>
+      <dd>{{ intervention.date|date:"d/m/Y" }}</dd>
+    </div>
+    <div>
+      <dt class="font-medium">Statut</dt>
+      <dd>
+        {% include "partials/status_badge.html" with statut=intervention.statut %}
+      </dd>
+    </div>
+  </dl>
+
+  <div class="flex justify-end space-x-2 pt-4">
+    <a href="{% url 'app_interventions:intervention_update' intervention.id %}"
+       class="text-white bg-yellow-500 hover:bg-yellow-600 font-medium rounded-lg text-sm px-5 py-2.5">
+      Modifier
+    </a>
+    <a href="{% url 'app_interventions:intervention_list' %}"
+       class="text-gray-700 bg-gray-100 border border-gray-300 hover:bg-gray-200 font-medium rounded-lg text-sm px-5 py-2.5">
+      Retour
+    </a>
+  </div>
+</div>
 {% endblock %}

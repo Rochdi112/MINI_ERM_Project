@@ -1,5 +1,51 @@
-{% extends 'base.html' %}
-{% block title %}Materiel list{% endblock %}
-{% block content %}
-<h2>Materiel list</h2>
-{% endblock %}
+<div class="p-6 bg-white dark:bg-gray-800 rounded-lg shadow space-y-4">
+  <div class="flex justify-between items-center">
+    <h2 class="text-xl font-bold text-gray-900 dark:text-white">Liste des matériels</h2>
+    <button hx-get="{% url 'app_materiels:materiel_create' %}"
+            hx-target="#modal-content"
+            data-modal-target="materielModal"
+            data-modal-toggle="materielModal"
+            class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">
+      <i class="fas fa-plus mr-2"></i> Ajouter
+    </button>
+  </div>
+
+  <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="materiel-table">
+    <thead class="text-xs uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th class="px-6 py-3">Nom</th>
+        <th class="px-6 py-3">Type</th>
+        <th class="px-6 py-3">Site</th>
+        <th class="px-6 py-3 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for materiel in materiels %}
+      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <td class="px-6 py-4">{{ materiel.nom }}</td>
+        <td class="px-6 py-4">{{ materiel.type }}</td>
+        <td class="px-6 py-4">{{ materiel.site }}</td>
+        <td class="px-6 py-4 text-right space-x-2">
+          <a href="{% url 'app_materiels:materiel_update' materiel.id %}" class="text-blue-600 hover:underline"><i class="fas fa-eye"></i></a>
+          <button hx-get="{% url 'app_materiels:materiel_update' materiel.id %}"
+                  hx-target="#modal-content"
+                  data-modal-target="materielModal"
+                  data-modal-toggle="materielModal"
+                  class="text-yellow-500 hover:text-yellow-600">
+            <i class="fas fa-edit"></i>
+          </button>
+          <button hx-get="{% url 'app_materiels:materiel_delete' materiel.id %}"
+                  hx-target="#modal-content"
+                  data-modal-target="materielModal"
+                  data-modal-toggle="materielModal"
+                  class="text-red-600 hover:text-red-700">
+            <i class="fas fa-trash"></i>
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% include 'partials/pagination.html' %}

@@ -1,28 +1,13 @@
-<form id="filter-form" hx-get="{% url 'app_interventions:htmx-filter' %}" hx-target="#intervention-list" hx-swap="innerHTML">
-  <select name="client" class="form-select">
-    <option value="">Tous les clients</option>
-    {% for client in clients %}
-      <option value="{{ client.id }}">{{ client.nom }}</option>
+<div class="flex items-center space-x-2">
+  <label for="{{ name }}" class="text-sm font-medium text-gray-700 dark:text-white">
+    {{ label }}
+  </label>
+  <select id="{{ name }}" name="{{ name }}"
+          class="border border-gray-300 text-sm rounded-lg p-2.5 dark:bg-gray-700 dark:text-white"
+          hx-get="{{ url }}" hx-target="{{ target }}" hx-trigger="change">
+    <option value="">{{ placeholder }}</option>
+    {% for value, display in choices %}
+      <option value="{{ value }}" {% if selected == value %}selected{% endif %}>{{ display }}</option>
     {% endfor %}
   </select>
-  <select name="site" class="form-select">
-    <option value="">Tous les sites</option>
-    {% for site in sites %}
-      <option value="{{ site.id }}">{{ site.nom }}</option>
-    {% endfor %}
-  </select>
-  <select name="materiel" class="form-select">
-    <option value="">Tous les matériels</option>
-    {% for materiel in materiels %}
-      <option value="{{ materiel.id }}">{{ materiel.nom }}</option>
-    {% endfor %}
-  </select>
-  <button type="submit" class="btn btn-primary">Filtrer</button>
-</form>
-<ul id="intervention-list">
-  {% for intervention in interventions %}
-    <li>{{ intervention }}</li>
-  {% empty %}
-    <li class="text-gray-400">Aucune intervention trouvée.</li>
-  {% endfor %}
-</ul>
+</div>

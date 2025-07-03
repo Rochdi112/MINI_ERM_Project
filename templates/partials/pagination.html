@@ -1,0 +1,34 @@
+{# Pagination partielle réutilisable #}
+{% if page_obj.has_other_pages %}
+<nav class="flex justify-between items-center pt-4" aria-label="Table navigation">
+  <span class="text-sm font-normal text-gray-500 dark:text-gray-400">
+    Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+  </span>
+  <ul class="inline-flex items-center -space-x-px text-sm h-8">
+    {% if page_obj.has_previous %}
+      <li>
+        <a href="?page={{ page_obj.previous_page_number }}"
+           class="flex items-center justify-center px-3 h-8 ml-0 leading-tight text-gray-500 bg-white hover:bg-gray-100">
+          Précédent
+        </a>
+      </li>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+      <li>
+        <a href="?page={{ num }}"
+           class="flex items-center justify-center px-3 h-8 leading-tight {% if num == page_obj.number %}text-blue-600 bg-blue-50{% else %}text-gray-500 hover:bg-gray-100{% endif %}">
+          {{ num }}
+        </a>
+      </li>
+    {% endfor %}
+    {% if page_obj.has_next %}
+      <li>
+        <a href="?page={{ page_obj.next_page_number }}"
+           class="flex items-center justify-center px-3 h-8 leading-tight text-gray-500 bg-white hover:bg-gray-100">
+          Suivant
+        </a>
+      </li>
+    {% endif %}
+  </ul>
+</nav>
+{% endif %}

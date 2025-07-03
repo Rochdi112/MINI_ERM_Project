@@ -1,5 +1,86 @@
 {% extends 'base.html' %}
-{% block title %}Intervention list{% endblock %}
 {% block content %}
-<h2>Intervention list</h2>
+<div class="p-4 space-y-6">
+
+  <!-- Titre et bouton ajout -->
+  <div class="flex justify-between items-center">
+    <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Interventions</h1>
+
+    <button 
+      hx-get="{% url 'app_interventions:intervention_create' %}" 
+      hx-target="#modal-content"
+      data-modal-target="interventionModal"
+      data-modal-toggle="interventionModal"
+      class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">
+      <i class="fas fa-plus mr-2"></i> Nouvelle intervention
+    </button>
+  </div>
+
+  <!-- Filtrage par statut -->
+  <div class="flex justify-end">
+    <select name="statut" id="statut"
+            class="border border-gray-300 text-sm rounded-lg p-2.5 dark:bg-gray-700 dark:text-white"
+            hx-get="{% url 'app_interventions:htmx-filter' %}" hx-target="#intervention-table" hx-trigger="change">
+      <option value="">Tous les statuts</option>
+      <option value="prevue">Prévue</option>
+      <option value="en_cours">En cours</option>
+      <option value="cloturee">Clôturée</option>
+    </select>
+  </div>
+
+  <!-- Tableau -->
+  <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+    <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400" id="intervention-table">
+      <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+        <tr>
+          <th class="px-6 py-3">Client</th>
+          <th class="px-6 py-3">Technicien</th>
+          <th class="px-6 py-3">Type</th>
+          <th class="px-6 py-3">Date</th>
+          <th class="px-6 py-3">Statut</th>
+          <th class="px-6 py-3 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for intervention in interventions %}
+        <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <td class="px-6 py-4">{{ intervention.client }}</td>
+          <td class="px-6 py-4">{{ intervention.technicien }}</td>
+          <td class="px-6 py-4">{{ intervention.get_type_display }}</td>
+          <td class="px-6 py-4">{{ intervention.date|date:"d/m/Y" }}</td>
+          <td class="px-6 py-4">
+            {% include "partials/status_badge.html" with statut=intervention.statut %}
+          </td>
+          <td class="px-6 py-4 text-right space-x-2">
+            <a href="{% url 'app_interventions:intervention_update' intervention.id %}" 
+               class="text-blue-600 hover:underline">
+              <i class="fas fa-eye"></i>
+            </a>
+
+            <button 
+              hx-get="{% url 'app_interventions:intervention_update' intervention.id %}"
+              hx-target="#modal-content"
+              data-modal-target="interventionModal"
+              data-modal-toggle="interventionModal"
+              class="text-yellow-500 hover:text-yellow-600">
+              <i class="fas fa-edit"></i>
+            </button>
+
+            {% if intervention.statut != 'cloturee' %}
+            <button 
+              hx-get="#" disabled
+              hx-target="#modal-content"
+              data-modal-target="interventionModal"
+              data-modal-toggle="interventionModal"
+              class="text-green-600 hover:text-green-700">
+              <i class="fas fa-check-circle"></i>
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
 {% endblock %}

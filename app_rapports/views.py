@@ -90,8 +90,15 @@ def rapport_pdf(request, pk):
 @login_required
 def generate_pdf(request, pk):
     rapport = get_object_or_404(Rapport, pk=pk)
+    # Création auto du profil si absent
+    if not hasattr(request.user, 'profilutilisateur'):
+        from core.models import ProfilUtilisateur
+        ProfilUtilisateur.objects.create(user=request.user, role='admin')
     user_profile = getattr(request.user, 'profilutilisateur', None)
-    if not (user_profile and (user_profile.role == 'admin' or (rapport.intervention.technicien and rapport.intervention.technicien.nom == request.user.username))):
+    is_technicien = False
+    if rapport.intervention.technicien and hasattr(rapport.intervention.technicien, 'user'):
+        is_technicien = rapport.intervention.technicien.user_id == request.user.id
+    if not (user_profile and (user_profile.role == 'admin' or is_technicien)):
         return HttpResponseForbidden("Accès refusé.")
     try:
         # Nettoyage ancien PDF si existant

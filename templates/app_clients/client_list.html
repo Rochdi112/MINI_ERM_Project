@@ -1,5 +1,58 @@
 {% extends 'base.html' %}
-{% block title %}Client list{% endblock %}
 {% block content %}
-<h2>Client list</h2>
+<div class="relative overflow-x-auto shadow-md sm:rounded-lg p-4">
+  <div class="flex justify-between items-center pb-4 bg-white dark:bg-gray-900">
+    <button 
+      hx-get="{% url 'app_clients:client_create' %}" 
+      hx-target="#modal-content"
+      data-modal-target="clientModal" 
+      data-modal-toggle="clientModal"
+      class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5 mr-2">
+      <i class="fas fa-plus mr-2"></i> Ajouter Client
+    </button>
+  </div>
+
+  <table class="w-full text-sm text-left text-gray-500 dark:text-gray-400">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th class="px-6 py-3">Nom</th>
+        <th class="px-6 py-3">Site</th>
+        <th class="px-6 py-3">Statut</th>
+        <th class="px-6 py-3 text-right">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for client in clients %}
+      <tr class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+        <td class="px-6 py-4">{{ client.nom }}</td>
+        <td class="px-6 py-4">{{ client.site }}</td>
+        <td class="px-6 py-4">
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-medium
+            {% if client.actif %}
+              bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300
+            {% else %}
+              bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300
+            {% endif %}">
+            {{ client.get_statut_display }}
+          </span>
+        </td>
+        <td class="px-6 py-4 text-right">
+          <button hx-get="{% url 'app_clients:client_update' client.id %}" hx-target="#modal-content"
+                  data-modal-target="clientModal" data-modal-toggle="clientModal"
+                  class="text-blue-600 hover:underline mr-2">
+            Modifier
+          </button>
+          <button hx-post="{% url 'app_clients:client_delete' client.id %}" hx-target="closest tr" hx-confirm="Supprimer ce client ?"
+                  class="text-red-600 hover:underline">
+            Supprimer
+          </button>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+{% include 'partials/pagination.html' %}
+{% include 'app_clients/client_modal.html' %}
 {% endblock %}

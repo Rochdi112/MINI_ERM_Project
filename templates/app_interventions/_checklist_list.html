@@ -1,7 +1,7 @@
-<ul id="checklist-list">
-  {% for item in items %}
-    {% include 'app_interventions/_checklist_item.html' with item=item %}
+<ul class="space-y-3" id="checklist-items">
+  {% for item in checklist.items.all %}
+    {% include "app_interventions/_checklist_item.html" with item=item %}
   {% empty %}
-    <li class="text-gray-400">Aucun item dans la checklist.</li>
+    <li class="text-gray-400 italic">Aucun élément pour cette checklist.</li>
   {% endfor %}
 </ul>

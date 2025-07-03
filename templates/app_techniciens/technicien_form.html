@@ -1,5 +1,28 @@
-{% extends 'base.html' %}
-{% block title %}Technicien form{% endblock %}
-{% block content %}
-<h2>Technicien form</h2>
-{% endblock %}
+<form method="post" hx-post="{% url 'app_techniciens:technicien_create' %}" hx-target="#technicien-table" hx-swap="outerHTML">
+  {% csrf_token %}
+  <div class="grid gap-6 mb-6 md:grid-cols-2">
+    <div>
+      <label for="nom" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Nom</label>
+      {{ form.nom }}
+    </div>
+    <div>
+      <label for="specialite" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Spécialité</label>
+      {{ form.specialite }}
+    </div>
+    <div>
+      <label for="telephone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Téléphone</label>
+      {{ form.telephone }}
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-2">
+    <button type="submit"
+            class="text-white bg-blue-600 hover:bg-blue-700 font-medium rounded-lg text-sm px-5 py-2.5">
+      Enregistrer
+    </button>
+    <button type="button" data-modal-hide="technicienModal"
+            class="text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 font-medium rounded-lg text-sm px-5 py-2.5">
+      Annuler
+    </button>
+  </div>
+</form>
